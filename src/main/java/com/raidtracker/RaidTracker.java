@@ -39,6 +39,8 @@ public class RaidTracker {
 	int raidLevel = -1;
     int totalPoints = -1;
     int personalPoints = -1;
+	int personalDeathCount = 0;
+	int totalTeamDeathCount = 0;
     int teamSize = -1;
     double percentage = -1.0;
     int completionCount = -1;
@@ -85,25 +87,6 @@ public class RaidTracker {
 	int zebakTime = -1;
 	int wardensTime = -1;
 	int toaCompTime = -1;
-
-	String toaPlayer1 = "";
-	String toaPlayer2 = "";
-	String toaPlayer3 = "";
-	String toaPlayer4 = "";
-	String toaPlayer5 = "";
-	String toaPlayer6 = "";
-	String toaPlayer7 = "";
-	String toaPlayer8 = "";
-
-	int toaPlayer1DeathCount = 0;
-	int toaPlayer2DeathCount = 0;
-	int toaPlayer4DeathCount = 0;
-	int toaPlayer5DeathCount = 0;
-	int toaPlayer6DeathCount = 0;
-	int toaPlayer7DeathCount = 0;
-	int toaPlayer3DeathCount = 0;
-	int toaPlayer8DeathCount = 0;
-
 
     //Every RaidTracker has a unique uniqueID but not necessarily a unique killCountID, if there are multiple drops.
     String uniqueID = UUID.randomUUID().toString();

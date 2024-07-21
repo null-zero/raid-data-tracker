@@ -237,32 +237,11 @@ public class RaidTrackerPlugin extends Plugin
 		if (raidTracker.isInTombsOfAmascut()) {
 			if (event.getVarbitId() >= Varbits.TOA_MEMBER_0_HEALTH && event.getVarbitId() <= Varbits.TOA_MEMBER_7_HEALTH && event.getValue() == 30) {
 				int toa_member = event.getVarbitId() - Varbits.TOA_MEMBER_0_HEALTH;
-				switch(toa_member) {
-					case 0:
-						raidTracker.toaPlayer1DeathCount++;
-						break;
-					case 1:
-						raidTracker.toaPlayer2DeathCount++;
-						break;
-					case 2:
-						raidTracker.toaPlayer3DeathCount++;
-						break;
-					case 3:
-						raidTracker.toaPlayer4DeathCount++;
-						break;
-					case 4:
-						raidTracker.toaPlayer5DeathCount++;
-						break;
-					case 5:
-						raidTracker.toaPlayer6DeathCount++;
-						break;
-					case 6:
-						raidTracker.toaPlayer7DeathCount++;
-						break;
-					case 7:
-						raidTracker.toaPlayer8DeathCount++;
-						break;
+				if (toa_member == 0) {
+					raidTracker.personalDeathCount++;
 				}
+
+				raidTracker.totalTeamDeathCount++;
 			}
 		}
 	}
@@ -558,43 +537,6 @@ public class RaidTrackerPlugin extends Plugin
 					raidTracker.setPersonalPoints(client.getVarbitValue(Varbits.PERSONAL_POINTS));
 					raidTracker.setTeamSize(client.getVarbitValue(Varbits.RAID_PARTY_SIZE));
 				} else if (raidTracker.isInTombsOfAmascut()) {
-					int MAX_RAIDERS = 8;
-
-					for (int i = 0; i < MAX_RAIDERS; i++) {
-						int TOA_RAIDERS_VARC_START = 1099;
-						String name = client.getVarcStrValue(TOA_RAIDERS_VARC_START + i);
-
-						if (name != null && !name.isEmpty()) {
-							String nameSanitized = Text.sanitize(name);
-							switch (i) {
-								case 0:
-									raidTracker.setToaPlayer1(nameSanitized);
-									break;
-								case 1:
-									raidTracker.setToaPlayer2(nameSanitized);
-									break;
-								case 2:
-									raidTracker.setToaPlayer3(nameSanitized);
-									break;
-								case 3:
-									raidTracker.setToaPlayer4(nameSanitized);
-									break;
-								case 4:
-									raidTracker.setToaPlayer5(nameSanitized);
-									break;
-								case 5:
-									raidTracker.setToaPlayer6(nameSanitized);
-									break;
-								case 6:
-									raidTracker.setToaPlayer7(nameSanitized);
-									break;
-								case 7:
-									raidTracker.setToaPlayer8(nameSanitized);
-									break;
-							}
-						}
-					}
-
 					raidTracker.setPersonalPoints(pointsTracker.getPersonalTotalPoints());
 				}
 
