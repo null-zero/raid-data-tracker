@@ -40,6 +40,7 @@ import net.runelite.api.widgets.WidgetUtil;
 import com.raidtracker.toapointstracker.pointstracker.PointsTracker;
 import com.raidtracker.toapointstracker.module.ComponentManager;
 import com.raidtracker.toapointstracker.module.TombsOfAmascutModule;
+import net.runelite.client.events.ConfigChanged;
 
 import javax.swing.SwingUtilities;
 import java.awt.image.BufferedImage;
@@ -149,6 +150,15 @@ public class RaidTrackerPlugin extends Plugin
 		reset();
 	}
 
+	@Subscribe
+	public void onConfigChanged(ConfigChanged e)
+	{
+		if (!e.getGroup().equals(RaidTrackerConfig.CONFIG_GROUP))
+		{
+			return;
+		}
+		panel.loadRTList();
+	}
 
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event) {
@@ -698,7 +708,6 @@ public class RaidTrackerPlugin extends Plugin
 
 					raidTracker.setSpecialLootInOwnName(raidTracker.getSpecialLootReceiver().toLowerCase().trim().equals(playerName.toLowerCase().trim()));
 
-
 					setSplits(raidTracker);
 				}
 			}
@@ -713,6 +722,7 @@ public class RaidTrackerPlugin extends Plugin
 
 				raidTracker.setSpecialLootInOwnName(raidTracker.getSpecialLootReceiver().toLowerCase().trim().equals(playerName.toLowerCase().trim()));
 
+				setSplits(raidTracker);
 			}
 
 			if (raidTracker.isRaidComplete() && message.startsWith(TWISTED_KIT_RECIPIENTS)) {

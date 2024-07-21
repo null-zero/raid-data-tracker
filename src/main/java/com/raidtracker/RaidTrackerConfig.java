@@ -4,9 +4,11 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("raidtracker")
+@ConfigGroup(RaidTrackerConfig.CONFIG_GROUP)
 public interface RaidTrackerConfig extends Config
 {
+
+	String CONFIG_GROUP = "raidtracker";
 	@ConfigItem(
 		keyName = "defaultFFA",
 		name = "default FFA",
