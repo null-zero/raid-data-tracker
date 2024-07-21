@@ -595,17 +595,21 @@ public class RaidTrackerPlugin extends Plugin
 						}
 					}
 
-					raidTracker.setTotalPoints(pointsTracker.getTotalPoints());
 					raidTracker.setPersonalPoints(pointsTracker.getPersonalTotalPoints());
 				}
 
 
 				raidTracker.setPercentage(raidTracker.getPersonalPoints() / (raidTracker.getTotalPoints() / 100.0));
 
-				// Without ToA point tracking, points are 0 causing % to be NaN and a log writing error
+				// Points being 0 (for any reason) causes the % to be NaN and cause a log writing error
 				if (Double.isNaN(raidTracker.getPercentage())) {
 					raidTracker.setTotalPoints(-1);
 					raidTracker.setPersonalPoints(-1);
+					raidTracker.setPercentage(-1);
+				}
+
+				// Without TOA party point tracking, the points percentage can't be calculated properly
+				if (raidTracker.getPercentage() < 0 && raidTracker.getPercentage() != -1) {
 					raidTracker.setPercentage(-1);
 				}
 

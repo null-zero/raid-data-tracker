@@ -128,7 +128,6 @@ public class PointsTracker implements PluginLifecycleComponent
 	private final EventBus eventBus;
 	private final Client client;
 	private final RaidTrackerConfig config;
-	private final PartyPointsTracker partyPointsTracker;
 	private final RaidStateTracker raidStateTracker;
 
 	@Getter
@@ -187,19 +186,16 @@ public class PointsTracker implements PluginLifecycleComponent
 			case SCABARAS:
 				personalTotalPoints += 300;
 				nonPartyPoints += 300;
-				updatePersonalPartyPoints(false);
 				break;
 
 			case APMEKEN:
 				personalTotalPoints += 450;
 				nonPartyPoints += 300;
-				updatePersonalPartyPoints(false);
 				break;
 
 			case CRONDIS:
 				personalTotalPoints += 400;
 				nonPartyPoints += 300;
-				updatePersonalPartyPoints(false);
 				break;
 
 			case HET:
@@ -229,7 +225,6 @@ public class PointsTracker implements PluginLifecycleComponent
 				personalTotalPoints = 0;
 			}
 
-			updatePersonalPartyPoints(false);
 		}
 		else if (e.getMessage().startsWith(ROOM_FAIL_MESSAGE))
 		{
@@ -240,7 +235,6 @@ public class PointsTracker implements PluginLifecycleComponent
 			personalRoomPoints = 0;
 
 			boolean isWardens = e.getMessage().contains("Wardens");
-			updatePersonalPartyPoints(isWardens);
 		}
 	}
 
@@ -271,8 +265,6 @@ public class PointsTracker implements PluginLifecycleComponent
 
 			this.personalRoomPoints = Math.min(roomMax, personalRoomPoints + pointsEarned);
 			this.personalTotalPoints = Math.min(MAX_TOTAL_POINTS, personalTotalPoints + pointsEarned);
-
-			updatePersonalPartyPoints(false);
 		}
 	}
 
@@ -283,7 +275,6 @@ public class PointsTracker implements PluginLifecycleComponent
 		{
 			personalTotalPoints += 300 * teamSize;
 			seenMvpItems.add(e.getItem().getId());
-			updatePersonalPartyPoints(false);
 		}
 	}
 
@@ -318,10 +309,6 @@ public class PointsTracker implements PluginLifecycleComponent
 
 	public int getTotalPoints()
 	{
-		if (partyPointsTracker.isInParty())
-		{
-			return partyPointsTracker.getTotalPartyPoints();
-		}
 		return getPersonalTotalPoints() + nonPartyPoints;
 	}
 
@@ -334,22 +321,6 @@ public class PointsTracker implements PluginLifecycleComponent
 		this.raidLevel = -1;
 		this.wardenDowns = 0;
 		this.seenMvpItems.clear();
-
-		partyPointsTracker.clearPartyPointsMap();
-		updatePersonalPartyPoints(true);
-	}
-
-	private void updatePersonalPartyPoints(boolean sendNow)
-	{
-		int points = getPersonalTotalPoints();
-		if (sendNow)
-		{
-			partyPointsTracker.sendPointsUpdate(points);
-		}
-		else
-		{
-			partyPointsTracker.schedulePointsUpdate(points);
-		}
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.raidtracker.toapointstracker.module;
 
 import com.raidtracker.RaidTrackerConfig;
-import com.raidtracker.toapointstracker.pointstracker.PartyPointsTracker;
 import com.raidtracker.toapointstracker.pointstracker.PointsTracker;
 import com.raidtracker.toapointstracker.util.RaidStateTracker;
 import com.google.inject.AbstractModule;
@@ -19,7 +18,6 @@ public class TombsOfAmascutModule extends AbstractModule
 	protected void configure()
 	{
 		Multibinder<PluginLifecycleComponent> lifecycleComponents = Multibinder.newSetBinder(binder(), PluginLifecycleComponent.class);
-		lifecycleComponents.addBinding().to(PartyPointsTracker.class);
 		lifecycleComponents.addBinding().to(PointsTracker.class);
 		lifecycleComponents.addBinding().to(RaidStateTracker.class);
 	}
