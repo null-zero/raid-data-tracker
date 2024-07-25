@@ -41,6 +41,7 @@ import com.raidtracker.toapointstracker.pointstracker.PointsTracker;
 import com.raidtracker.toapointstracker.module.ComponentManager;
 import com.raidtracker.toapointstracker.module.TombsOfAmascutModule;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.PluginMessage;
 
 import javax.swing.SwingUtilities;
 import java.awt.image.BufferedImage;
@@ -67,6 +68,9 @@ public class RaidTrackerPlugin extends Plugin
 
 	private static final Pattern TOA_ROOM_COMPLETE_PATTERN = Pattern.compile("Challenge complete: ([A-Za-z- ]+).*Duration:.*?([0-9]+:[0-9]+\\.?[0-9]+)(?:\\. )?.*");
 	private static final Pattern TOA_COMPLETION_PATTERN = Pattern.compile(".*Tombs of Amascut: (.*) Mode (total|challenge) completion time:.*?([0-9]+:[.0-9]+)\\..*");
+
+	private static final String TOA_EVENT_NAMESPACE = "tombs-of-amascut";
+	private static final String TOA_EVENT_NAME_POINTS = "raidCompletedPoints";
 
 	@Inject
 	private Client client;
@@ -308,6 +312,25 @@ public class RaidTrackerPlugin extends Plugin
 				raidTracker.setTeamSize(pointsTracker.getTeamSize());
 				raidTracker.setRaidLevel(client.getVarbitValue(Varbits.TOA_RAID_LEVEL));
 			}
+		}
+	}
+
+	// Thank Adam, LlemonDuck, and jocopa3 for creating PluginMessage event in core for us
+	@Subscribe
+	public void onPluginMessage(PluginMessage message)
+	{
+		if (message.getNamespace().equals(TOA_EVENT_NAMESPACE)
+			&& message.getName().equals(TOA_EVENT_NAME_POINTS)
+			&& (Integer) message.getData().get("version") == 1)
+		{
+
+			log.info("received PluginMessage from Tombs of Amascut plugin");
+			int personalPoints = (Integer) message.getData().get("personalPoints");
+			int totalPoints = (Integer) message.getData().get("totalPoints");
+
+			raidTracker.setPersonalPoints(personalPoints);
+			raidTracker.setTotalPoints(totalPoints);
+			raidTracker.setPercentage(raidTracker.getPersonalPoints() / (raidTracker.getTotalPoints() / 100.0));
 		}
 	}
 
