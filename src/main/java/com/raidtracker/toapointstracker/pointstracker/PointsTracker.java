@@ -1,6 +1,8 @@
 package com.raidtracker.toapointstracker.pointstracker;
 
 import com.raidtracker.RaidTrackerConfig;
+import com.raidtracker.RaidTrackerPlugin;
+import com.raidtracker.RaidType;
 import com.raidtracker.toapointstracker.module.PluginLifecycleComponent;
 import com.raidtracker.toapointstracker.util.RaidRoom;
 import com.raidtracker.toapointstracker.util.RaidState;
@@ -8,9 +10,6 @@ import com.raidtracker.toapointstracker.util.RaidStateChanged;
 import com.raidtracker.toapointstracker.util.RaidStateTracker;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.awt.Color;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.util.ColorUtil;
 
 @Slf4j
 @Singleton
@@ -130,6 +128,9 @@ public class PointsTracker implements PluginLifecycleComponent
 	private final RaidTrackerConfig config;
 	private final RaidStateTracker raidStateTracker;
 
+	@Inject
+	private RaidTrackerPlugin raidTrackerPlugin;
+
 	@Getter
 	private int personalRoomPoints;
 	private int personalTotalPoints;
@@ -180,6 +181,7 @@ public class PointsTracker implements PluginLifecycleComponent
 		switch (e.getPreviousState().getCurrentRoom())
 		{
 			case TOMB:
+				raidTrackerPlugin.updateCurrentRT(RaidType.TOA);
 				break;
 
 			// puzzle estimates

@@ -224,24 +224,11 @@ public class RaidTrackerPlugin extends Plugin
 		}
 
 		if (tempInToa ^ raidTracker.isInTombsOfAmascut()) {
+
+			// Removed else if for ToA
+			// No varbits are changed when a player leaves ToA, so the else-if would never fire
 			if (tempInToa && raidTracker.isLoggedIn()) {
 				checkToaPresence();
-			}
-			else if (raidTracker.isRaidComplete()) {
-				//not tested
-
-				if (writerStarted) {
-					return;
-				}
-
-				fw.writeToFile(raidTracker);
-
-				writerStarted = true;
-
-				SwingUtilities.invokeLater(() -> {
-					panel.addDrop(raidTracker);
-					reset();
-				});
 			}
 			else {
 				reset();
@@ -249,6 +236,7 @@ public class RaidTrackerPlugin extends Plugin
 		}
 
 		if (raidTracker.isInTombsOfAmascut()) {
+			// Tombs of Amascut orb healths 0=hide 1-27=% of health - 27 is 100% health and 1 is 0% health, 30=dead
 			if (event.getVarbitId() >= Varbits.TOA_MEMBER_0_HEALTH && event.getVarbitId() <= Varbits.TOA_MEMBER_7_HEALTH && event.getValue() == 30) {
 				int toa_member = event.getVarbitId() - Varbits.TOA_MEMBER_0_HEALTH;
 				if (toa_member == 0) {
@@ -456,8 +444,9 @@ public class RaidTrackerPlugin extends Plugin
 				writerStarted = true;
 
 				SwingUtilities.invokeLater(() -> {
+					// Doesn't use reset() due to ToA using a log update function on tomb exit
 					panel.addDrop(raidTracker);
-					reset();
+					writerStarted = false;
 				});
 				break;
 		}
@@ -1000,4 +989,20 @@ public class RaidTrackerPlugin extends Plugin
 	public void setFw(FileReadWriter fw) {
 		this.fw = fw;
 	}
+
+	public void updateCurrentRT(RaidType raidType) {
+		if (writerStarted) {
+			return;
+		}
+
+		writerStarted = true;
+
+		fw.updateRTLog(raidTracker, raidType);
+
+		SwingUtilities.invokeLater(() -> {
+			panel.updateView(true);
+			reset();
+		});
+	}
+
 }

@@ -36,7 +36,6 @@ public class FileReadWriter {
 	@Inject
 	private Gson gson;
 
-
 	public void writeToFile(RaidTracker raidTracker)
 	{
 		String dir;
@@ -174,6 +173,42 @@ public class FileReadWriter {
 	public void updateUsername(final String username) {
 		this.username = username;
 		createFolders();
+	}
+
+	// Used for making sure ToA loot and points is accurate
+	// Initial write made on reward chest interface opened,
+	// this updates after player leaves to account for purples/pets others receive
+	public void updateRTLog(RaidTracker raidTracker, RaidType raidType) {
+		String dir = getRaidDirectory(raidType);
+
+		try
+		{
+			JsonParser parser = new JsonParser();
+
+			String fileName = dir + "\\raid_tracker_data.log";
+
+			ArrayList<RaidTracker> RTList = readFromFile(raidType);
+
+			FileWriter fw = new FileWriter(fileName, false); //the true will append the new data
+
+			for (RaidTracker RT : RTList)
+			{
+
+				if (RT.getUniqueID().equals(raidTracker.getUniqueID()) && !RT.equals(raidTracker))
+				{
+					log.info("writer updated log");
+					RT = raidTracker;
+				}
+
+				gson.toJson(parser.parse(getJSONString(RT, gson, parser)), fw);
+
+				fw.append("\n");
+			}
+
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void updateRTList(ArrayList<RaidTracker> RTList, RaidType raidType) {
