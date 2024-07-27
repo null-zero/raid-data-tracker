@@ -106,6 +106,8 @@ public class RaidTrackerPlugin extends Plugin
 	private RaidTrackerPanel panel;
 	private NavigationButton navButton;
 
+	@Inject
+	private ConfigManager configManager;
 
 	@Provides
 	RaidTrackerConfig provideConfig(ConfigManager configManager)
@@ -121,7 +123,7 @@ public class RaidTrackerPlugin extends Plugin
 
 	@Override
 	protected void startUp() {
-		panel = new RaidTrackerPanel(itemManager, fw, config, clientThread, client);
+		panel = new RaidTrackerPanel(itemManager, fw, config, clientThread, client, configManager);
 
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "panel-icon.png");
 

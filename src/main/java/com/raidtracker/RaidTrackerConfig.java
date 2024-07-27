@@ -146,4 +146,19 @@ public interface RaidTrackerConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "toaFilterCustomLow",
+		name = "toaFilterCustomLow",
+		description = "toaFilterCustomLow",
+		hidden = true
+	)
+	default int toaFilterCustomLow() { return 0; }
+
+	@ConfigItem(
+		keyName = "toaFilterCustomHigh",
+		name = "toaFilterCustomHigh",
+		description = "toaFilterCustomHigh",
+		hidden = true
+	)
+	default int toaFilterCustomHigh() { return 600; }
 }

@@ -7,14 +7,15 @@ import com.raidtracker.RaidTrackerItem;
 import com.raidtracker.RaidType;
 import com.raidtracker.WorldUtils;
 import com.raidtracker.filereadwriter.FileReadWriter;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemID;
-import net.runelite.api.WorldType;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
@@ -30,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -37,10 +39,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -59,20 +64,20 @@ import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
-
+import java.util.regex.Pattern;
 import static java.util.Comparator.comparing;
 
 @Slf4j
 public class RaidTrackerPanel extends PluginPanel {
 
-    @Setter
+	@Setter
     private ItemManager itemManager;
     private final FileReadWriter fw;
     private final RaidTrackerConfig config;
     private final ClientThread clientThread;
     private final Client client;
+	private final ConfigManager configManager;
 
     @Setter
     private ArrayList<RaidTracker> coxRTList;
@@ -99,6 +104,16 @@ public class RaidTrackerPanel extends PluginPanel {
 	private String raidLevelFilter = "All Levels";
     @Setter
     private String teamSizeFilter = "All sizes";
+
+	private final HashMap<String, int[]> toaFilterMap = new HashMap<>(4);
+
+	@Setter
+	private int raidLevelFilterLow = 0;
+	@Setter
+	private int raidLevelFilterHigh = 600;
+
+	@Setter
+	private boolean raidLevelFilterIsAPI = false;
 
 	@Getter
 	private RaidType selectedRaidTab = RaidType.COX;
@@ -148,12 +163,22 @@ public class RaidTrackerPanel extends PluginPanel {
 		RaidUniques.TUMEKENS_GUARDIAN
 	);
 
-    public RaidTrackerPanel(final ItemManager itemManager, FileReadWriter fw, RaidTrackerConfig config, ClientThread clientThread, Client client) {
+	private Component titleComponent;
+	private Component filterComponent;
+
+    public RaidTrackerPanel(final ItemManager itemManager, FileReadWriter fw, RaidTrackerConfig config, ClientThread clientThread, Client client, ConfigManager configManager) {
         this.itemManager = itemManager;
         this.fw = fw;
         this.config = config;
         this.clientThread = clientThread;
         this.client = client;
+		this.configManager = configManager;
+
+		toaFilterMap.put("All Levels", new int[]{0, 600});
+		toaFilterMap.put("Entry Mode", new int[]{0, 149});
+		toaFilterMap.put("Normal Mode", new int[]{150, 299});
+		toaFilterMap.put("Expert Mode", new int[]{300, 600});
+		toaFilterMap.put("Custom", new int[]{config.toaFilterCustomLow(), config.toaFilterCustomHigh()});
 
         panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
@@ -185,11 +210,15 @@ public class RaidTrackerPanel extends PluginPanel {
         panel.repaint();
     }
 
-    private void updateView() {
-        panel.removeAll();
+	public void updateView() {
+		updateView(false);
+	}
+
+    public void updateView(boolean filterUpdate) {
 
         // If the panel is updated we don't need to show data for Beta worlds
         if (WorldUtils.playerOnBetaWorld(client)) {
+			panel.removeAll();
             showDisabledView();
             return;
         }
@@ -204,19 +233,34 @@ public class RaidTrackerPanel extends PluginPanel {
         JPanel mvpPanel = getMvpPanel();
         JPanel timeSplitsPanel = getTimeSplitsPanel();
 
+		// Replaces panel.removeAll() to allow for selective component removal when dealing with ToA filter keypresses
+		for(Component component : panel.getComponents()) {
+			if ((component.equals(titleComponent) || component.equals(filterComponent)) && filterUpdate) {
+				continue;
+			}
+			panel.remove(component);
+		}
+
         if (config.showRegularDrops()) {
             SwingUtilities.invokeLater(() -> {
                 regularDrops = getRegularDropsPanel();
 
-                panel.removeAll();
+				for(Component component : panel.getComponents()) {
+					if ((component.equals(titleComponent) || component.equals(filterComponent)) && filterUpdate) {
+						continue;
+					}
+					panel.remove(component);
+				}
 
-                if (config.showTitle()) {
-                    panel.add(title);
-                }
+				if (config.showTitle() && !filterUpdate) {
+					panel.add(title);
+					titleComponent = title;
+				}
 
-                if (config.showFilters()) {
-                    panel.add(filterPanel);
-                }
+				if (config.showFilters() && !filterUpdate) {
+					panel.add(filterPanel);
+					filterComponent = filterPanel;
+				}
 
                 panel.add(Box.createRigidArea(new Dimension(0, 5)));
 
@@ -263,13 +307,15 @@ public class RaidTrackerPanel extends PluginPanel {
             });
         }
 
-        if (config.showTitle()) {
-            panel.add(title);
-        }
+		if (config.showTitle() && !filterUpdate) {
+			panel.add(title);
+			titleComponent = title;
+		}
 
-        if (config.showFilters()) {
-            panel.add(filterPanel);
-        }
+		if (config.showFilters() && !filterUpdate) {
+			panel.add(filterPanel);
+			filterComponent = filterPanel;
+		}
 
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
 
@@ -863,7 +909,9 @@ public class RaidTrackerPanel extends PluginPanel {
 
         JComboBox<String> choices = new JComboBox<>(new String []{"All Time", "12 Hours", "Today", "3 Days", "Week", "Month","3 Months", "Year", "X Kills"});
         choices.setSelectedItem(dateFilter);
-        choices.setPreferredSize(new Dimension(100, 25));
+		choices.setPreferredSize(new Dimension(105, 25));
+		choices.setMinimumSize(new Dimension(100, 25));
+		choices.setMaximumSize(new Dimension(110, 25));
         choices.setFocusable(false);
 
         choices.addActionListener(e ->  {
@@ -881,7 +929,9 @@ public class RaidTrackerPanel extends PluginPanel {
 
         JComboBox<String> cm = new JComboBox<>(new String []{"CM & Normal", "Normal Only", "CM Only"});
         cm.setFocusable(false);
-        cm.setPreferredSize(new Dimension(110,25));
+		cm.setPreferredSize(new Dimension(105,25));
+		cm.setMinimumSize(new Dimension(100, 25));
+		cm.setMaximumSize(new Dimension(110, 25));
         cm.setSelectedItem(cmFilter);
 
         cm.addActionListener(e -> {
@@ -893,7 +943,9 @@ public class RaidTrackerPanel extends PluginPanel {
 
         JComboBox<String> mvp = new JComboBox<>(new String []{"Both", "My MVP", "Not My MVP"});
         mvp.setFocusable(false);
-        mvp.setPreferredSize(new Dimension(110,25));
+		mvp.setPreferredSize(new Dimension(105,25));
+		mvp.setMinimumSize(new Dimension(100, 25));
+		mvp.setMaximumSize(new Dimension(110, 25));
         mvp.setSelectedItem(mvpFilter);
 
         mvp.addActionListener(e -> {
@@ -903,13 +955,24 @@ public class RaidTrackerPanel extends PluginPanel {
             }
         });
 
-		JComboBox<String> raidLevel = new JComboBox<>(new String []{"All Levels", "Entry Mode", "Normal Mode", "Expert Mode"});
+		JComboBox<String> raidLevel = new JComboBox<>(new String []{"All Levels", "Entry Mode", "Normal Mode", "Expert Mode", "Custom"});
 		raidLevel.setFocusable(false);
-		raidLevel.setPreferredSize(new Dimension(110,25));
+		raidLevel.setPreferredSize(new Dimension(105,25));
+		raidLevel.setMinimumSize(new Dimension(100, 25));
+		raidLevel.setMaximumSize(new Dimension(110, 25));
 		raidLevel.setSelectedItem(raidLevelFilter);
 
 		raidLevel.addActionListener(e -> {
+
+			if (raidLevelFilterIsAPI) {
+				raidLevelFilterIsAPI = false;
+				return;
+			}
+
 			raidLevelFilter = raidLevel.getSelectedItem().toString();
+			raidLevelFilterLow = toaFilterMap.get(raidLevelFilter)[0];
+			raidLevelFilterHigh = toaFilterMap.get(raidLevelFilter)[1];
+
 			if (loaded) {
 				updateView();
 			}
@@ -922,7 +985,7 @@ public class RaidTrackerPanel extends PluginPanel {
 				teamSize = new JComboBox<>(new String []{"All sizes", "Solo", "Duo", "Trio", "4-man", "5-man"});
 				break;
 			case TOA:
-				teamSize = new JComboBox<>(new String[]{"All sizes", "Solo", "Duo", "Trio", "4-man", "5-man", "6-man", "7-man", "8-man"});
+				teamSize = new JComboBox<>(new String []{"All sizes", "Solo", "Duo", "Trio", "4-man", "5-man", "6-man", "7-man", "8-man"});
 				break;
 			case COX:
 			default:
@@ -930,7 +993,9 @@ public class RaidTrackerPanel extends PluginPanel {
 		}
 
         teamSize.setFocusable(false);
-        teamSize.setPreferredSize(new Dimension(110,25));
+        teamSize.setPreferredSize(new Dimension(105, 25));
+		teamSize.setMinimumSize(new Dimension(100, 25));
+		teamSize.setMaximumSize(new Dimension(110, 25));
         teamSize.setSelectedItem(teamSizeFilter);
 
         teamSize.addActionListener(e -> {
@@ -947,6 +1012,11 @@ public class RaidTrackerPanel extends PluginPanel {
         c.gridy = 2;
         wrapper.add(choices, c);
 
+		c.gridy = 4;
+
+		wrapper.add(teamSize, c);
+
+		c.gridy = 2;
         c.gridx = 1;
         c.anchor = GridBagConstraints.EAST;
 
@@ -967,18 +1037,41 @@ public class RaidTrackerPanel extends PluginPanel {
         c.gridy = 3;
         wrapper.add(Box.createRigidArea(new Dimension(0, 2)), c);
 
-        c.gridy = 4;
-        wrapper.add(teamSize, c);
+		c.gridy = 4;
+
+		if (selectedRaidTab.equals(RaidType.TOA))
+		{
+			wrapper.add(getToAFilterPanel(), c);
+		}
 
         JPanel buttonWrapper = new JPanel();
-        buttonWrapper.setPreferredSize(new Dimension(50, 20));
-        buttonWrapper.setLayout(new GridLayout(0, 2, 2 ,0));
+        buttonWrapper.setPreferredSize(new Dimension(82, 20));
         buttonWrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
+		buttonWrapper.setLayout(new GridLayout(0, 2, 2 ,0));
+		if (selectedRaidTab.equals(RaidType.TOA))
+		{
+			buttonWrapper.setLayout(new GridLayout(0, 3, 2 ,0));
+		}
 
+		BufferedImage saveIcon = ImageUtil.loadImageResource(getClass(), "save-grey.png");
+		BufferedImage saveHover = ImageUtil.loadImageResource(getClass(), "save-white.png");
         BufferedImage refreshIcon = ImageUtil.loadImageResource(getClass(), "refresh-grey.png");
         BufferedImage refreshHover = ImageUtil.loadImageResource(getClass(), "refresh-white.png");
         BufferedImage deleteIcon = ImageUtil.loadImageResource(getClass(), "delete-grey.png");
         BufferedImage deleteHover = ImageUtil.loadImageResource(getClass(), "delete-white.png");
+
+		JButton save = imageButton(saveIcon);
+		save.setToolTipText("Save Custom Filter");
+		save.addActionListener(e -> {
+			final int saveInput = JOptionPane.showConfirmDialog(this.getRootPane(), "<html>Are you sure you want to save this Custom filter preset? It will overwrite your previous Custom filter values.<br/>There is no way to undo this action.</html>", "Warning", JOptionPane.YES_NO_OPTION);
+			if (saveInput == JOptionPane.YES_OPTION)
+			{
+				configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "toaFilterCustomLow", raidLevelFilterLow);
+				configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "toaFilterCustomHigh", raidLevelFilterHigh);
+				toaFilterMap.put("Custom", new int[]{raidLevelFilterLow, raidLevelFilterHigh});
+				updateView();
+			}
+		});
 
         JButton refresh = imageButton(refreshIcon);
         refresh.setToolTipText("Refresh kills logged");
@@ -996,6 +1089,15 @@ public class RaidTrackerPanel extends PluginPanel {
             }
         });
 
+		save.addMouseListener(new MouseAdapter() {
+			public void mouseEntered (MouseEvent e){
+				save.setIcon(new ImageIcon(saveHover));
+			}
+
+			public void mouseExited (java.awt.event.MouseEvent e){
+				save.setIcon(new ImageIcon(saveIcon));
+			}
+		});
         refresh.addMouseListener(new MouseAdapter() {
             public void mouseEntered (MouseEvent e){
                 refresh.setIcon(new ImageIcon(refreshHover));
@@ -1016,7 +1118,10 @@ public class RaidTrackerPanel extends PluginPanel {
             }
         });
 
-
+		if (selectedRaidTab.equals(RaidType.TOA))
+		{
+			buttonWrapper.add(save);
+		}
         buttonWrapper.add(refresh);
         buttonWrapper.add(delete);
 
@@ -1055,7 +1160,177 @@ public class RaidTrackerPanel extends PluginPanel {
         return wrapper;
     }
 
-    private JPanel getTimeSplitsPanel() {
+	private JPanel getToAFilterPanel() {
+		JPanel wrapper = new JPanel();
+		wrapper.setLayout(new GridBagLayout());
+		wrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
+		wrapper.setPreferredSize(new Dimension(105,25));
+		wrapper.setMinimumSize(new Dimension(100, 25));
+		wrapper.setMaximumSize(new Dimension(110, 25));
+
+		GridBagConstraints c2 = new GridBagConstraints();
+
+		c2.weightx = 1;
+		c2.weighty = 1;
+		c2.gridx = 0;
+		c2.gridy = 0;
+
+		JTextField filterFieldLow = new JTextField();
+		JTextField filterFieldHigh = new JTextField();
+
+		filterFieldLow.setMinimumSize(new Dimension(40, 25));
+		filterFieldLow.setMaximumSize(new Dimension(42, 25));
+		filterFieldLow.setText(String.valueOf(raidLevelFilterLow));
+		filterFieldLow.setFocusable(true);
+		filterFieldLow.putClientProperty( "JTextField.selectAllOnFocusPolicy", "never" );
+
+		String val1 = filterFieldLow.getText();
+		filterFieldLow.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				String userInput = filterFieldLow.getText();
+
+
+				if (userInput.isEmpty())
+				{
+					raidLevelFilterLow = 0;
+					return;
+				}
+
+				if (!Pattern.matches("-?[0-9]+", userInput))
+				{
+					filterFieldLow.setText(val1);
+					return;
+				}
+
+				if (userInput.startsWith("0")) {
+					filterFieldLow.setText(String.valueOf(Integer.parseInt(userInput)));
+				}
+
+				raidLevelFilterLow = Integer.parseInt(userInput);
+
+				if (Integer.parseInt(userInput) == 0) {
+					raidLevelFilterLow = 0;
+				}
+
+				if (Integer.parseInt(userInput) > 600)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							filterFieldLow.setText("600");
+							raidLevelFilterLow = 600;
+						}
+					});
+				}
+
+				updateRaidFilterSilently(wrapper);
+			}
+		});
+
+
+		filterFieldHigh.setMinimumSize(new Dimension(40, 25));
+		filterFieldHigh.setMaximumSize(new Dimension(42, 25));
+		filterFieldHigh.setText(String.valueOf(raidLevelFilterHigh));
+		filterFieldHigh.setFocusable(true);
+		filterFieldHigh.putClientProperty( "JTextField.selectAllOnFocusPolicy", "never" );
+
+		String val2 = filterFieldHigh.getText();
+
+		filterFieldHigh.addKeyListener(new KeyAdapter()
+		{
+
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				String userInput = filterFieldHigh.getText();
+
+				if (userInput.isEmpty()) {
+					raidLevelFilterHigh = 600;
+					return;
+				}
+
+				if (!Pattern.matches("-?[0-9]+", userInput)) {
+					filterFieldHigh.setText(val2);
+					return;
+				}
+
+				if (Integer.parseInt(userInput) == 0) {
+					return;
+				}
+
+				if (userInput.startsWith("0")) {
+					filterFieldHigh.setText(String.valueOf(Integer.parseInt(userInput)));
+				}
+
+				raidLevelFilterHigh = Integer.parseInt(userInput);
+
+				if (Integer.parseInt(userInput) > 600) {
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							filterFieldHigh.setText("600");
+							raidLevelFilterHigh = 600;
+						}
+					});
+				}
+
+				updateRaidFilterSilently(wrapper);
+
+			}
+		});
+
+		wrapper.add(filterFieldLow, c2);
+
+		c2.gridx = 1;
+
+		JLabel to = new JLabel();
+		to.setText("to");
+
+		to.setHorizontalAlignment(SwingConstants.CENTER);
+
+		to.setMinimumSize(new Dimension(22, 25));
+
+		wrapper.add(to, c2);
+		c2.gridx = 2;
+		wrapper.add(filterFieldHigh, c2);
+
+		return wrapper;
+	}
+
+	private void updateRaidFilterSilently(JPanel wrapper)
+	{
+		JComboBox<String> tempField;
+		for (int i = wrapper.getParent().getComponentCount() - 1; i >= 0; i--) {
+			if (wrapper.getParent().getComponent(i) instanceof  JComboBox) {
+				tempField = (JComboBox<String>) wrapper.getParent().getComponent(i);
+
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+
+						raidLevelFilterIsAPI = true;
+						tempField.setSelectedIndex(tempField.getItemCount() - 1);
+					}
+				});
+
+				break;
+			}
+		}
+
+		raidLevelFilter = "Custom";
+		updateView(true);
+	}
+
+	private JPanel getTimeSplitsPanel() {
         final JPanel wrapper = new JPanel();
 
         if (loaded) {
@@ -1554,19 +1829,22 @@ public class RaidTrackerPanel extends PluginPanel {
 				}
 				break;
 			case TOA:
-				if (raidLevelFilter.equals("All Levels")) {
-					tempRTList = toaRTList;
-				} else if (raidLevelFilter.equals("Entry Mode"))
-				{
-					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() < 150)
-						.collect(Collectors.toCollection(ArrayList::new));
-				} else if (raidLevelFilter.equals("Normal Mode")) {
-					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 150 && RT.getRaidLevel() < 300)
-						.collect(Collectors.toCollection(ArrayList::new));
-				} else {
-					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 300)
-						.collect(Collectors.toCollection(ArrayList::new));
-				}
+				tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= raidLevelFilterLow && RT.getRaidLevel() <= raidLevelFilterHigh)
+					.collect(Collectors.toCollection(ArrayList::new));
+//				if (raidLevelFilter.equals("All Levels")) {
+//					tempRTList = toaRTList;
+//
+//				} else if (raidLevelFilter.equals("Entry Mode"))
+//				{
+//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() < 150)
+//						.collect(Collectors.toCollection(ArrayList::new));
+//				} else if (raidLevelFilter.equals("Normal Mode")) {
+//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 150 && RT.getRaidLevel() < 300)
+//						.collect(Collectors.toCollection(ArrayList::new));
+//				} else {
+//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 300)
+//						.collect(Collectors.toCollection(ArrayList::new));
+//				}
 				break;
 			case COX:
 			default:
@@ -1737,7 +2015,6 @@ public class RaidTrackerPanel extends PluginPanel {
         }
         return seconds / 60 + ":" + (seconds % 60 < 10 ? "0" : "") + seconds % 60;
     }
-
 
 }
 
