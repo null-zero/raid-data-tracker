@@ -144,7 +144,10 @@ public class RaidTrackerPlugin extends Plugin
 
 		if (client.getGameState().equals(GameState.LOGGED_IN) || client.getGameState().equals(GameState.LOADING))
 		{
-			fw.updateUsername(client.getUsername());
+			if (client.getAccountHash() != -1) {
+				System.out.println(String.valueOf(client.getAccountHash()).replace("-", ""));
+				fw.updateUsername(String.valueOf(client.getAccountHash()).replace("-", ""));
+			}
 			SwingUtilities.invokeLater(() -> panel.loadRTList());
 		}
 	}
@@ -258,7 +261,9 @@ public class RaidTrackerPlugin extends Plugin
 
 		if (event.getGameState() == GameState.LOGGING_IN)
 		{
-			fw.updateUsername(client.getUsername());
+			if (client.getAccountHash() != -1) {
+				fw.updateUsername(String.valueOf(client.getAccountHash()));
+			}
 			SwingUtilities.invokeLater(() -> panel.loadRTList());
 
 		}
