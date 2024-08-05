@@ -116,6 +116,7 @@ public class RaidTrackerPanel extends PluginPanel {
 	private boolean raidLevelFilterIsAPI = false;
 
 	@Getter
+	@Setter
 	private RaidType selectedRaidTab = RaidType.COX;
 
     private JPanel regularDrops = new JPanel();

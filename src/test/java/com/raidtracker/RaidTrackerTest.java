@@ -15,6 +15,7 @@ import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.http.api.item.ItemPrice;
 import org.junit.Before;
@@ -110,6 +111,10 @@ public class RaidTrackerTest extends TestCase
 	@Mock
 	@Bind
 	private Client client;
+
+	@Mock
+	@Bind
+	private ConfigManager configManager;
 
 	@Mock
 	@Bind
