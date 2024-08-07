@@ -1304,12 +1304,12 @@ public class RaidTrackerPanel extends PluginPanel {
 
 		return wrapper;
 	}
-
+	@SuppressWarnings("unchecked")
 	private void updateRaidFilterSilently(JPanel wrapper)
 	{
 		JComboBox<String> tempField;
 		for (int i = wrapper.getParent().getComponentCount() - 1; i >= 0; i--) {
-			if (wrapper.getParent().getComponent(i) instanceof  JComboBox) {
+			if (wrapper.getParent().getComponent(i) instanceof JComboBox) {
 				tempField = (JComboBox<String>) wrapper.getParent().getComponent(i);
 
 				SwingUtilities.invokeLater(new Runnable()
