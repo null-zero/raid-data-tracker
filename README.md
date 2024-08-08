@@ -26,6 +26,7 @@ If you find any bugs or problems, feel free to add me on discord, and I'll accep
   - A massive thank you to [@LLemonDuck](https://github.com/LlemonDuck)
     - Implements [Tombs of Amascut](https://github.com/LlemonDuck/tombs-of-amascut) point tracking for personal ToA points
     - Implements Tombs of Amascut custom events for more accurate team point tracking when config "Send to External Plugins" setting is enabled on the ToA plugin.
+    - Integration Warning panels if players don't have the ToA plugin installed, enabled, or have the "Send to External Plugins" config enabled
   - Loot tracking
   - Split tracking
   - Custom Raid Level filter + single saveable preset slot
