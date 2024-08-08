@@ -31,6 +31,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -109,6 +110,9 @@ public class RaidTrackerPlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
+	@Inject
+	private PluginManager pluginManager;
+
 	@Provides
 	RaidTrackerConfig provideConfig(ConfigManager configManager)
 	{
@@ -123,7 +127,7 @@ public class RaidTrackerPlugin extends Plugin
 
 	@Override
 	protected void startUp() {
-		panel = new RaidTrackerPanel(itemManager, fw, config, clientThread, client, configManager);
+		panel = new RaidTrackerPanel(itemManager, fw, config, clientThread, client, configManager, pluginManager);
 
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "panel-icon.png");
 
@@ -450,6 +454,9 @@ public class RaidTrackerPlugin extends Plugin
 					panel.addDrop(raidTracker);
 					writerStarted = false;
 				});
+				break;
+			case (InterfaceID.TOA_PARTY):
+				SwingUtilities.invokeLater(() -> panel.showWarningView());
 				break;
 		}
 	}

@@ -17,6 +17,8 @@ import net.runelite.api.ItemID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
@@ -78,6 +80,7 @@ public class RaidTrackerPanel extends PluginPanel {
     private final ClientThread clientThread;
     private final Client client;
 	private final ConfigManager configManager;
+	private final PluginManager pluginManager;
 
     @Setter
     private ArrayList<RaidTracker> coxRTList;
@@ -167,13 +170,14 @@ public class RaidTrackerPanel extends PluginPanel {
 	private Component titleComponent;
 	private Component filterComponent;
 
-    public RaidTrackerPanel(final ItemManager itemManager, FileReadWriter fw, RaidTrackerConfig config, ClientThread clientThread, Client client, ConfigManager configManager) {
+    public RaidTrackerPanel(final ItemManager itemManager, FileReadWriter fw, RaidTrackerConfig config, ClientThread clientThread, Client client, ConfigManager configManager, PluginManager pluginManager) {
         this.itemManager = itemManager;
         this.fw = fw;
         this.config = config;
         this.clientThread = clientThread;
         this.client = client;
 		this.configManager = configManager;
+		this.pluginManager = pluginManager;
 
 		toaFilterMap.put("All Levels", new int[]{0, 600});
 		toaFilterMap.put("Entry Mode", new int[]{0, 149});
@@ -210,6 +214,102 @@ public class RaidTrackerPanel extends PluginPanel {
         panel.revalidate();
         panel.repaint();
     }
+
+	public void showWarningView() {
+		panel.removeAll();
+
+		JPanel title = new JPanel();
+		title.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = SwingConstants.HORIZONTAL;
+
+
+		JPanel titleLabelWrapper = new JPanel();
+		String toaPluginExternalConfig = configManager.getConfiguration("tombsofamascut", "pointsTrackerAllowExternal");
+
+		Plugin toaPlugin = pluginManager.getPlugins()
+			.stream()
+			.filter(p -> p.getName().contains("Tombs of Amascut"))
+			.findFirst()
+			.orElse(null);
+
+		boolean isToAInstalled = toaPlugin != null;
+		boolean isToAEnabled = isToAInstalled && pluginManager.isPluginEnabled(toaPlugin);
+
+		if (!isToAInstalled) {
+			titleLabelWrapper.add(getWarningLabel(0), BorderLayout.CENTER);
+		} else if (!isToAEnabled) {
+			titleLabelWrapper.add(getWarningLabel(1), BorderLayout.CENTER);
+		} else if (!Boolean.parseBoolean(toaPluginExternalConfig)) {
+			titleLabelWrapper.add(getWarningLabel(2), BorderLayout.CENTER);
+		} else {
+			updateView();
+		}
+
+		gbc.gridwidth = 2;
+		title.add(titleLabelWrapper, gbc);
+
+		gbc.gridwidth = 1;
+		gbc.gridy++;
+		JButton enable = new JButton();
+		if (!isToAEnabled) {
+			enable.setText("Enable plugin");
+		} else
+		{
+			enable.setText("Enable setting");
+		}
+		enable.addActionListener(e -> {
+			if (!isToAEnabled) {
+				pluginManager.setPluginEnabled(toaPlugin, true);
+				configManager.setConfiguration("tombsofamascut", "pointsTrackerAllowExternal", true);
+			} else
+			{
+				configManager.setConfiguration("tombsofamascut", "pointsTrackerAllowExternal", true);
+			}
+			updateView();
+		});
+
+		if (isToAInstalled)
+		{
+			title.add(enable, gbc);
+			gbc.gridx++;
+		}
+		JButton close = new JButton();
+		close.setText("Close");
+		close.addActionListener(e -> {
+			updateView();
+		});
+		title.add(close, gbc);
+
+		panel.add(title);
+		panel.revalidate();
+		panel.repaint();
+	}
+
+	public JLabel getWarningLabel(int option) {
+
+		JLabel titleLabel;
+		switch (option) {
+			case 1:
+				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin enabled.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you enable it.<br></html>");
+				break;
+			case 2:
+				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin's <br>\"Send to External plugins\"<br>config setting enabled.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you enable it.<br></html>");
+				break;
+			case 0:
+			default:
+				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin installed.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you install<br>it from the plugin hub.<br></html>");
+				break;
+		}
+
+		titleLabel.setForeground(Color.WHITE);
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		return titleLabel;
+	}
 
 	public void updateView() {
 		updateView(false);
@@ -1304,6 +1404,7 @@ public class RaidTrackerPanel extends PluginPanel {
 
 		return wrapper;
 	}
+
 	@SuppressWarnings("unchecked")
 	private void updateRaidFilterSilently(JPanel wrapper)
 	{
