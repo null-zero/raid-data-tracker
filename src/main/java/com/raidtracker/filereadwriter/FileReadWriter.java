@@ -32,6 +32,7 @@ public class FileReadWriter {
 	private String coxDir;
 	private String tobDir;
 	private String toaDir;
+    private String defaultDir;
 
 	@Inject
 	private Gson gson;
@@ -47,7 +48,7 @@ public class FileReadWriter {
 		} else if (raidTracker.isInRaidChambers()) {
 			dir = coxDir;
 		} else {
-			dir = coxDir;
+			dir = defaultDir;
 			log.warn("writeToFile called without an inRaid flag set.", new IllegalStateException());
 		}
 
@@ -150,17 +151,21 @@ public class FileReadWriter {
 		File dir_cox = new File(dir, "cox");
 		File dir_tob = new File(dir, "tob");
 		File dir_toa = new File(dir, "toa");
+        File dir_default = new File(dir, "unknown");
 		IGNORE_RESULT(dir_cox.mkdir());
 		IGNORE_RESULT(dir_tob.mkdir());
 		IGNORE_RESULT(dir_toa.mkdir());
+        IGNORE_RESULT(dir_default.mkdir());
 		File newCoxFile = new File(dir_cox + "\\raid_tracker_data.log");
 		File newTobFile = new File(dir_tob + "\\raid_tracker_data.log");
 		File newToaFile = new File(dir_toa + "\\raid_tracker_data.log");
+        File newDefaultFile = new File(dir_default + "\\raid_tracker_data.log");
 
 		try {
 			IGNORE_RESULT(newCoxFile.createNewFile());
 			IGNORE_RESULT(newTobFile.createNewFile());
 			IGNORE_RESULT(newToaFile.createNewFile());
+            IGNORE_RESULT(newDefaultFile.createNewFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,6 +173,7 @@ public class FileReadWriter {
 		this.coxDir = dir_cox.getAbsolutePath();
 		this.tobDir = dir_tob.getAbsolutePath();
 		this.toaDir = dir_toa.getAbsolutePath();
+        this.defaultDir = dir_default.getAbsolutePath();
 	}
 
 	public void updateUsername(final String username) {
@@ -263,13 +269,14 @@ public class FileReadWriter {
 
 	public String getRaidDirectory(RaidType raidType) {
 		switch(raidType) {
+            case COX:
+                return coxDir;
 			case TOB:
 				return tobDir;
 			case TOA:
 				return toaDir;
-			case COX:
-			default:
-				return coxDir;
+            default:
+                return defaultDir;
 		}
 	}
 }
