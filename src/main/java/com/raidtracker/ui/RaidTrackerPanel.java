@@ -1300,7 +1300,7 @@ public class RaidTrackerPanel extends PluginPanel {
 					return;
 				}
 
-				if (!Pattern.matches("-?[0-9]+", userInput))
+				if (!Pattern.matches("-?\\d+", userInput))
 				{
 					filterFieldLow.setText(val1);
 					return;
@@ -1355,7 +1355,7 @@ public class RaidTrackerPanel extends PluginPanel {
 					return;
 				}
 
-				if (!Pattern.matches("-?[0-9]+", userInput)) {
+				if (!Pattern.matches("-?\\d+", userInput)) {
 					filterFieldHigh.setText(val2);
 					return;
 				}
