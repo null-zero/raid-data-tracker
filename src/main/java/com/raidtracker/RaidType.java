@@ -5,4 +5,5 @@ public enum RaidType
 	COX,
 	TOB,
 	TOA
+public enum RaidType {
 }
