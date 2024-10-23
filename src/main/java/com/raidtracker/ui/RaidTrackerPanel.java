@@ -258,8 +258,7 @@ public class RaidTrackerPanel extends PluginPanel {
 		JButton enable = new JButton();
 		if (!isToAEnabled) {
 			enable.setText("Enable plugin");
-		} else
-		{
+		} else {
 			enable.setText("Enable setting");
 		}
 		enable.addActionListener(e -> {
@@ -273,8 +272,7 @@ public class RaidTrackerPanel extends PluginPanel {
 			updateView();
 		});
 
-		if (isToAInstalled)
-		{
+		if (isToAInstalled) {
 			title.add(enable, gbc);
 			gbc.gridx++;
 		}
