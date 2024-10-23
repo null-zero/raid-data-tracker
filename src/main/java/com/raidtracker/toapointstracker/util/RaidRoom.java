@@ -46,15 +46,13 @@ public enum RaidRoom
 	HET(new int[]{14674}, "Het", RaidRoomType.PUZZLE),
 	AKKHA(new int[]{14676}, "Akkha", RaidRoomType.BOSS),
 	WARDENS(new int[]{15184, 15696}, "Wardens", RaidRoomType.BOSS),
-	TOMB(new int[]{14672}, "Tomb", RaidRoomType.LOBBY),
-	;
+	TOMB(new int[]{14672}, "Tomb", RaidRoomType.LOBBY);
 
 	public enum RaidRoomType
 	{
 		LOBBY,
 		PUZZLE,
-		BOSS,
-		;
+		BOSS;
 	}
 
 	private final int[] regionIds;
