@@ -67,8 +67,8 @@ public class RaidTrackerPlugin extends Plugin
 	private static final String DUST_RECIPIENTS = "Dust recipients: ";
 	private static final String TWISTED_KIT_RECIPIENTS = "Twisted Kit recipients: ";
 
-	private static final Pattern TOA_ROOM_COMPLETE_PATTERN = Pattern.compile("Challenge complete: ([A-Za-z- ]+).*Duration:.*?([0-9]+:[0-9]+\\.?[0-9]+)(?:\\. )?.*");
-	private static final Pattern TOA_COMPLETION_PATTERN = Pattern.compile(".*Tombs of Amascut: (.*) Mode (total|challenge) completion time:.*?([0-9]+:[.0-9]+)\\..*");
+	private static final Pattern TOA_ROOM_COMPLETE_PATTERN = Pattern.compile("Challenge complete: ([A-Za-z- ]+).*Duration:.*?(\\d+:\\d+\\.?\\d+)(?:\\. )?.*");
+	private static final Pattern TOA_COMPLETION_PATTERN = Pattern.compile(".*Tombs of Amascut: (.*) Mode (total|challenge) completion time:.*?(\\d+:\\d+\\.?\\d+)\\..*");
 
 	private static final String TOA_EVENT_NAMESPACE = "tombs-of-amascut";
 	private static final String TOA_EVENT_NAME_POINTS = "raidCompletedPoints";
