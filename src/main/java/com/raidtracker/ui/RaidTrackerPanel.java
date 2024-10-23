@@ -163,7 +163,7 @@ public class RaidTrackerPanel extends PluginPanel {
 		RaidUniques.MASORI_MASK,
 		RaidUniques.MASORI_BODY,
 		RaidUniques.MASORI_CHAPS,
-		RaidUniques.SHADOW,
+		RaidUniques.TUMEKENS_SHADOW,
 		RaidUniques.TUMEKENS_GUARDIAN
 	);
 

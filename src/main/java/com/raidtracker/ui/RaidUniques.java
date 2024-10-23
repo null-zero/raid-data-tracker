@@ -37,7 +37,7 @@ public enum RaidUniques {
 	MASORI_MASK("Masori mask", ItemID.MASORI_MASK),
 	MASORI_BODY("Masori body", ItemID.MASORI_BODY),
 	MASORI_CHAPS("Masori chaps", ItemID.MASORI_CHAPS),
-	SHADOW("Tumeken's shadow (uncharged)", ItemID.TUMEKENS_SHADOW),
+    TUMEKENS_SHADOW("Tumeken's shadow (uncharged)", ItemID.TUMEKENS_SHADOW),
 	TUMEKENS_GUARDIAN("Tumeken's guardian", ItemID.TUMEKENS_GUARDIAN);
 
     @Getter
