@@ -73,6 +73,9 @@ public class RaidTrackerPlugin extends Plugin
 	private static final String TOA_EVENT_NAMESPACE = "tombs-of-amascut";
 	private static final String TOA_EVENT_NAME_POINTS = "raidCompletedPoints";
 
+    private static final int TOA_CANVAS_WIDGET_ID = 481;
+    private static final int TOA_TIMER_WIDGET_ID = 46;
+
 	@Inject
 	private Client client;
 
@@ -296,6 +299,7 @@ public class RaidTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick gameTick) {
 		int WIDGET_TIMER = WidgetUtil.packComponentId(481, 46);
+		int WIDGET_TIMER = WidgetUtil.packComponentId(TOA_CANVAS_WIDGET_ID, TOA_TIMER_WIDGET_ID);
 		if (raidTracker.isInTombsOfAmascut() && client.getWidget(WIDGET_TIMER) != null) {
 			if (!Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "00:00")
                     && !Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "0:00.00")
