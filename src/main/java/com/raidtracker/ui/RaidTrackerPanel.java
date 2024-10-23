@@ -170,7 +170,15 @@ public class RaidTrackerPanel extends PluginPanel {
 	private Component titleComponent;
 	private Component filterComponent;
 
-    public RaidTrackerPanel(final ItemManager itemManager, FileReadWriter fw, RaidTrackerConfig config, ClientThread clientThread, Client client, ConfigManager configManager, PluginManager pluginManager) {
+    public RaidTrackerPanel(
+        final ItemManager itemManager,
+        FileReadWriter fw,
+        RaidTrackerConfig config,
+        ClientThread clientThread,
+        Client client,
+        ConfigManager configManager,
+        PluginManager pluginManager
+    ) {
         this.itemManager = itemManager;
         this.fw = fw;
         this.config = config;
@@ -293,14 +301,41 @@ public class RaidTrackerPanel extends PluginPanel {
 		JLabel titleLabel;
 		switch (option) {
 			case 1:
-				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin enabled.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you enable it.<br></html>");
+				titleLabel = new JLabel(
+                    "<html>Raid Data Tracker has detected<br>" +
+                    "that you do not have the<br>" +
+                    "Tombs of Amascut plugin enabled.<br><br>" +
+                    "The Tracker benefits from the<br>" +
+                    "accurate point tracking provided by<br>" +
+                    "the Tombs of Amascut plugin.<br><br>" +
+                    "It is recommended that you enable it.<br></html>"
+                );
 				break;
 			case 2:
-				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin's <br>\"Send to External plugins\"<br>config setting enabled.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you enable it.<br></html>");
+				titleLabel = new JLabel(
+                    "<html>Raid Data Tracker has detected<br>" +
+                    "that you do not have the<br>" +
+                    "Tombs of Amascut plugin's <br>" +
+                    "\"Send to External plugins\"<br>" +
+                    "config setting enabled.<br><br>" +
+                    "The Tracker benefits from the<br>" +
+                    "accurate point tracking provided by<br>" +
+                    "the Tombs of Amascut plugin.<br><br>" +
+                    "It is recommended that you enable it.<br></html>"
+                );
 				break;
 			case 0:
 			default:
-				titleLabel = new JLabel("<html>Raid Data Tracker has detected<br>that you do not have the<br>Tombs of Amascut plugin installed.<br><br>The Tracker benefits from the<br>accurate point tracking provided by<br> the Tombs of Amascut plugin.<br><br>It is recommended that you install<br>it from the plugin hub.<br></html>");
+				titleLabel = new JLabel(
+                    "<html>Raid Data Tracker has detected<br>" +
+                    "that you do not have the<br>" +
+                    "Tombs of Amascut plugin installed.<br><br>" +
+                    "The Tracker benefits from the<br>" +
+                    "accurate point tracking provided by<br>" +
+                    "the Tombs of Amascut plugin.<br><br>" +
+                    "It is recommended that you install<br>" +
+                    "it from the plugin hub.<br></html>"
+                );
 				break;
 		}
 
@@ -1202,7 +1237,13 @@ public class RaidTrackerPanel extends PluginPanel {
 		JButton save = imageButton(saveIcon);
 		save.setToolTipText("Save Custom Filter");
 		save.addActionListener(e -> {
-			final int saveInput = JOptionPane.showConfirmDialog(this.getRootPane(), "<html>Are you sure you want to save this Custom filter preset? It will overwrite your previous Custom filter values.<br/>There is no way to undo this action.</html>", "Warning", JOptionPane.YES_NO_OPTION);
+			final int saveInput = JOptionPane.showConfirmDialog(
+                this.getRootPane(),
+                "<html>Are you sure you want to save this Custom filter preset?<br>" +
+                    "It will overwrite your previous Custom filter values.<br>" +
+                    "There is no way to undo this action.</html>",
+                "Warning - Raid Data Tracker Custom Filter",
+                JOptionPane.YES_NO_OPTION);
 			if (saveInput == JOptionPane.YES_OPTION)
 			{
 				configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "toaFilterCustomLow", raidLevelFilterLow);
@@ -1505,10 +1546,20 @@ public class RaidTrackerPanel extends PluginPanel {
                     timeTable.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
                     timeTable.add(textPanel("Upper Level", 0));
-                    timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getUpperTime() > 0).min(comparing(RaidTracker::getUpperTime)).orElse(new RaidTracker()).getUpperTime()), 1));
+                    timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getUpperTime() > 0)
+                            .min(comparing(RaidTracker::getUpperTime))
+                            .orElse(new RaidTracker())
+                            .getUpperTime()
+                    ), 1));
 
                     if (!cmFilter.equals("Normal Only")) {
-                        int middleTime = getFilteredRTList().stream().filter(RT -> RT.getMiddleTime() > 0).filter(RT -> RT.getMiddleTime() > 0).min(comparing(RaidTracker::getMiddleTime)).orElse(new RaidTracker()).getMiddleTime();
+                        int middleTime = getFilteredRTList().stream()
+                                            .filter(RT -> RT.getMiddleTime() > 0)
+                                            .min(comparing(RaidTracker::getMiddleTime))
+                                            .orElse(new RaidTracker())
+                                            .getMiddleTime();
                         if (middleTime > 0) {
                             timeTable.add(textPanel("Middle Level", 0));
                             timeTable.add(textPanel(secondsToMinuteString(middleTime), 1));
@@ -1516,7 +1567,13 @@ public class RaidTrackerPanel extends PluginPanel {
 
                     }
                     timeTable.add(textPanel("Lower Level", 0));
-                    timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getLowerTime() > 0).min(comparing(RaidTracker::getLowerTime)).orElse(new RaidTracker()).getLowerTime()), 1));
+                    timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getLowerTime() > 0)
+                            .min(comparing(RaidTracker::getLowerTime))
+                            .orElse(new RaidTracker())
+                            .getLowerTime()
+                    ), 1));
 
                     timeTable.add(textPanel("Olm Time", 0));
 
@@ -1525,7 +1582,9 @@ public class RaidTrackerPanel extends PluginPanel {
                         .min(Comparator.comparingInt(o -> o.getRaidTime() - o.getLowerTime()))
                         .orElse(new RaidTracker());
 
-                    timeTable.add(textPanel(secondsToMinuteString(olmTimeRT.getRaidTime() - olmTimeRT.getLowerTime()), 1));
+                    timeTable.add(textPanel(secondsToMinuteString(
+                        olmTimeRT.getRaidTime() - olmTimeRT.getLowerTime()
+                    ), 1));
                     wrapper.add(timeTable);
                     break;
 				case TOB:
@@ -1533,17 +1592,55 @@ public class RaidTrackerPanel extends PluginPanel {
 					timeTable.setBorder(new EmptyBorder(5,3,1,3));
 					timeTable.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 					timeTable.add(textPanel("Maiden Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getMaidenTime() > 0).min(comparing(RaidTracker::getMaidenTime)).orElse(new RaidTracker()).getMaidenTime()), 1));
+					timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getMaidenTime() > 0)
+                            .min(comparing(RaidTracker::getMaidenTime))
+                            .orElse(new RaidTracker())
+                            .getMaidenTime()
+                    ), 1));
 					timeTable.add(textPanel("Bloat Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getBloatTime() > 0).min(comparing(RaidTracker::getBloatTime)).orElse(new RaidTracker()).getBloatTime()), 1));
+					timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getBloatTime() > 0)
+                            .min(comparing(RaidTracker::getBloatTime))
+                            .orElse(new RaidTracker())
+                            .getBloatTime()
+                    ), 1));
 					timeTable.add(textPanel("Nylo Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getNyloTime() > 0).min(comparing(RaidTracker::getNyloTime)).orElse(new RaidTracker()).getNyloTime()), 1));
+					timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getNyloTime() > 0)
+                            .min(comparing(RaidTracker::getNyloTime))
+                            .orElse(new RaidTracker())
+                            .getNyloTime()
+                    ), 1));
 					timeTable.add(textPanel("Sotetseg Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getSotetsegTime() > 0).min(comparing(RaidTracker::getSotetsegTime)).orElse(new RaidTracker()).getSotetsegTime()), 1));
+					timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getSotetsegTime() > 0)
+                            .min(comparing(RaidTracker::getSotetsegTime))
+                            .orElse(new RaidTracker())
+                            .getSotetsegTime()
+                    ), 1));
 					timeTable.add(textPanel("Xarpus Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getNyloTime() > 0).min(comparing(RaidTracker::getXarpusTime)).orElse(new RaidTracker()).getXarpusTime()), 1));
+					timeTable.add(textPanel(secondsToMinuteString(
+                            getFilteredRTList().stream()
+                                .filter(RT -> RT.getNyloTime() > 0)
+                                .min(comparing(RaidTracker::getXarpusTime))
+                                .orElse(new RaidTracker())
+                                .getXarpusTime()
+                        ), 1));
 					timeTable.add(textPanel("Verzik Time", 0));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getVerzikTime() > 0).min(comparing(RaidTracker::getVerzikTime)).orElse(new RaidTracker()).getVerzikTime()), 1));
+					timeTable.add(textPanel(
+                            secondsToMinuteString(
+                                getFilteredRTList().stream()
+                                    .filter(RT -> RT.getVerzikTime() > 0)
+                                    .min(comparing(RaidTracker::getVerzikTime))
+                                    .orElse(new RaidTracker())
+                                    .getVerzikTime()
+                            ),
+                        1));
 					break;
 				case TOA:
 					timeTableFourCol.setLayout(new GridLayout(0, 4));
@@ -1557,37 +1654,114 @@ public class RaidTrackerPanel extends PluginPanel {
 
 					timeTableFourCol = stripedPanel(true);
 					timeTableFourCol.add(textPanel("Ba-Ba", 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getApmekenTime() > 0).min(comparing(RaidTracker::getApmekenTime)).orElse(new RaidTracker()).getApmekenTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getBabaTime() > 0).min(comparing(RaidTracker::getBabaTime)).orElse(new RaidTracker()).getBabaTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getApmekenTime() > 0 && RT.getBabaTime() > 0).mapToInt(RT -> RT.getApmekenTime() + RT.getBabaTime()).reduce(Math::min).orElse(0)), 3));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getApmekenTime() > 0)
+                            .min(comparing(RaidTracker::getApmekenTime))
+                            .orElse(new RaidTracker())
+                            .getApmekenTime()
+                    ), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getBabaTime() > 0)
+                            .min(comparing(RaidTracker::getBabaTime))
+                            .orElse(new RaidTracker())
+                            .getBabaTime()), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getApmekenTime() > 0 && RT.getBabaTime() > 0)
+                            .mapToInt(RT -> RT.getApmekenTime() + RT.getBabaTime())
+                            .reduce(Math::min)
+                            .orElse(0)
+                    ), 3));
 					timeTableContainer.add(timeTableFourCol);
 
 					timeTableFourCol = stripedPanel(false);
 					timeTableFourCol.add(textPanel("Kephri", 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getScabarasTime() > 0).min(comparing(RaidTracker::getScabarasTime)).orElse(new RaidTracker()).getScabarasTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getKephriTime() > 0).min(comparing(RaidTracker::getKephriTime)).orElse(new RaidTracker()).getKephriTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getScabarasTime() > 0 && RT.getKephriTime() > 0).mapToInt(RT -> RT.getScabarasTime() + RT.getKephriTime()).reduce(Math::min).orElse(0)), 3));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getScabarasTime() > 0)
+                            .min(comparing(RaidTracker::getScabarasTime))
+                            .orElse(new RaidTracker())
+                            .getScabarasTime()
+                    ), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getKephriTime() > 0)
+                            .min(comparing(RaidTracker::getKephriTime))
+                            .orElse(new RaidTracker())
+                            .getKephriTime()
+                    ), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getScabarasTime() > 0 && RT.getKephriTime() > 0)
+                            .mapToInt(RT -> RT.getScabarasTime() + RT.getKephriTime())
+                            .reduce(Math::min)
+                            .orElse(0)
+                    ), 3));
 					timeTableContainer.add(timeTableFourCol);
 
 					timeTableFourCol = stripedPanel(true);
 					timeTableFourCol.add(textPanel("Akkha", 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getHetTime() > 0).min(comparing(RaidTracker::getHetTime)).orElse(new RaidTracker()).getHetTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getAkkhaTime() > 0).min(comparing(RaidTracker::getAkkhaTime)).orElse(new RaidTracker()).getAkkhaTime()), 2));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getHetTime() > 0 && RT.getAkkhaTime() > 0).mapToInt(RT -> RT.getHetTime() + RT.getAkkhaTime()).reduce(Math::min).orElse(0)), 3));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getHetTime() > 0)
+                            .min(comparing(RaidTracker::getHetTime))
+                            .orElse(new RaidTracker())
+                            .getHetTime()
+                    ), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getAkkhaTime() > 0)
+                            .min(comparing(RaidTracker::getAkkhaTime))
+                            .orElse(new RaidTracker())
+                            .getAkkhaTime()
+                    ), 2));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getHetTime() > 0 && RT.getAkkhaTime() > 0)
+                            .mapToInt(RT -> RT.getHetTime() + RT.getAkkhaTime())
+                            .reduce(Math::min)
+                            .orElse(0)
+                    ), 3));
 					timeTableContainer.add(timeTableFourCol);
 
 					timeTableFourCol = stripedPanel(false);
 					timeTableFourCol.add(textPanel("Zebak", 4));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getCrondisTime() > 0).min(comparing(RaidTracker::getCrondisTime)).orElse(new RaidTracker()).getCrondisTime()), 4));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getZebakTime() > 0).min(comparing(RaidTracker::getZebakTime)).orElse(new RaidTracker()).getZebakTime()), 4));
-					timeTableFourCol.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getCrondisTime() > 0 && RT.getZebakTime() > 0).mapToInt(RT -> RT.getCrondisTime() + RT.getZebakTime()).reduce(Math::min).orElse(0)), 5));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getCrondisTime() > 0)
+                            .min(comparing(RaidTracker::getCrondisTime))
+                            .orElse(new RaidTracker())
+                            .getCrondisTime()
+                    ), 4));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getZebakTime() > 0)
+                            .min(comparing(RaidTracker::getZebakTime))
+                            .orElse(new RaidTracker())
+                            .getZebakTime()
+                    ), 4));
+					timeTableFourCol.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getCrondisTime() > 0 && RT.getZebakTime() > 0)
+                            .mapToInt(RT -> RT.getCrondisTime() + RT.getZebakTime())
+                            .reduce(Math::min)
+                            .orElse(0)
+                    ), 5));
 					timeTableContainer.add(timeTableFourCol);
 
 					timeTable = new JPanel();
 					timeTable.setLayout(new GridLayout(0, 2));
 					timeTable.setBackground(ColorScheme.DARK_GRAY_COLOR);
 					timeTable.add(textPanel("Completion Time", 4));
-					timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getToaCompTime() > 0).min(comparing(RaidTracker::getToaCompTime)).orElse(new RaidTracker()).getToaCompTime()), 5));
+					timeTable.add(textPanel(secondsToMinuteString(
+                        getFilteredRTList().stream()
+                            .filter(RT -> RT.getToaCompTime() > 0)
+                            .min(comparing(RaidTracker::getToaCompTime))
+                            .orElse(new RaidTracker())
+                            .getToaCompTime()
+                    ), 5));
 					timeTableContainer.add(timeTable);
 					break;
 				default:
@@ -1601,12 +1775,24 @@ public class RaidTrackerPanel extends PluginPanel {
 
 			if (selectedRaidTab == RaidType.TOA) {
 				timeTable.add(textPanel("Overall Time", 7));
-				timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getRaidTime() > 0).min(comparing(RaidTracker::getRaidTime)).orElse(new RaidTracker()).getRaidTime()), 6));
+				timeTable.add(textPanel(secondsToMinuteString(
+                    getFilteredRTList().stream()
+                        .filter(RT -> RT.getRaidTime() > 0)
+                        .min(comparing(RaidTracker::getRaidTime))
+                        .orElse(new RaidTracker())
+                        .getRaidTime()
+                ), 6));
 				timeTableContainer.add(timeTable);
 				wrapper.add(timeTableContainer);
 			} else {
 				timeTable.add(textPanel("Overall Time", 2));
-				timeTable.add(textPanel(secondsToMinuteString(getFilteredRTList().stream().filter(RT -> RT.getRaidTime() > 0).min(comparing(RaidTracker::getRaidTime)).orElse(new RaidTracker()).getRaidTime()), 3));
+				timeTable.add(textPanel(secondsToMinuteString(
+                    getFilteredRTList().stream()
+                        .filter(RT -> RT.getRaidTime() > 0)
+                        .min(comparing(RaidTracker::getRaidTime))
+                        .orElse(new RaidTracker())
+                        .getRaidTime()
+                ), 3));
 				wrapper.add(timeTable);
 			}
         }
