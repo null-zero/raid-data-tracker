@@ -1213,8 +1213,7 @@ public class RaidTrackerPanel extends PluginPanel {
 
 		c.gridy = 4;
 
-		if (selectedRaidTab.equals(RaidType.TOA))
-		{
+		if (selectedRaidTab.equals(RaidType.TOA)) {
 			wrapper.add(getToAFilterPanel(), c);
 		}
 
@@ -1222,8 +1221,7 @@ public class RaidTrackerPanel extends PluginPanel {
         buttonWrapper.setPreferredSize(new Dimension(82, 20));
         buttonWrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR.darker());
 		buttonWrapper.setLayout(new GridLayout(0, 2, 2 ,0));
-		if (selectedRaidTab.equals(RaidType.TOA))
-		{
+		if (selectedRaidTab.equals(RaidType.TOA)) {
 			buttonWrapper.setLayout(new GridLayout(0, 3, 2 ,0));
 		}
 
@@ -1298,8 +1296,7 @@ public class RaidTrackerPanel extends PluginPanel {
             }
         });
 
-		if (selectedRaidTab.equals(RaidType.TOA))
-		{
+		if (selectedRaidTab.equals(RaidType.TOA)) {
 			buttonWrapper.add(save);
 		}
         buttonWrapper.add(refresh);
@@ -1365,22 +1362,18 @@ public class RaidTrackerPanel extends PluginPanel {
 		filterFieldLow.putClientProperty( "JTextField.selectAllOnFocusPolicy", "never" );
 
 		String val1 = filterFieldLow.getText();
-		filterFieldLow.addKeyListener(new KeyAdapter()
-		{
+		filterFieldLow.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e)
-			{
+			public void keyReleased(KeyEvent e) {
 				String userInput = filterFieldLow.getText();
 
 
-				if (userInput.isEmpty())
-				{
+				if (userInput.isEmpty()) {
 					raidLevelFilterLow = 0;
 					return;
 				}
 
-				if (!Pattern.matches("-?\\d+", userInput))
-				{
+				if (!Pattern.matches("-?\\d+", userInput)) {
 					filterFieldLow.setText(val1);
 					return;
 				}
@@ -1395,13 +1388,11 @@ public class RaidTrackerPanel extends PluginPanel {
 					raidLevelFilterLow = 0;
 				}
 
-				if (Integer.parseInt(userInput) > 600)
-				{
-					SwingUtilities.invokeLater(new Runnable()
-					{
+				if (Integer.parseInt(userInput) > 600) {
+					SwingUtilities.invokeLater(new Runnable() {
+
 						@Override
-						public void run()
-						{
+						public void run() {
 							filterFieldLow.setText("600");
 							raidLevelFilterLow = 600;
 						}
@@ -1421,12 +1412,10 @@ public class RaidTrackerPanel extends PluginPanel {
 
 		String val2 = filterFieldHigh.getText();
 
-		filterFieldHigh.addKeyListener(new KeyAdapter()
-		{
+		filterFieldHigh.addKeyListener(new KeyAdapter() {
 
 			@Override
-			public void keyReleased(KeyEvent e)
-			{
+			public void keyReleased(KeyEvent e) {
 				String userInput = filterFieldHigh.getText();
 
 				if (userInput.isEmpty()) {
@@ -1485,8 +1474,7 @@ public class RaidTrackerPanel extends PluginPanel {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void updateRaidFilterSilently(JPanel wrapper)
-	{
+	private void updateRaidFilterSilently(JPanel wrapper) {
 		JComboBox<String> tempField;
 		for (int i = wrapper.getParent().getComponentCount() - 1; i >= 0; i--) {
 			if (wrapper.getParent().getComponent(i) instanceof JComboBox) {

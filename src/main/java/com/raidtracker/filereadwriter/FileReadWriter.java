@@ -187,8 +187,7 @@ public class FileReadWriter {
 	public void updateRTLog(RaidTracker raidTracker, RaidType raidType) {
 		String dir = getRaidDirectory(raidType);
 
-		try
-		{
+		try {
 			JsonParser parser = new JsonParser();
 
 			String fileName = dir + "\\raid_tracker_data.log";
@@ -197,11 +196,9 @@ public class FileReadWriter {
 
 			FileWriter fw = new FileWriter(fileName, false); //the true will append the new data
 
-			for (RaidTracker RT : RTList)
-			{
+			for (RaidTracker RT : RTList) {
 
-				if (RT.getUniqueID().equals(raidTracker.getUniqueID()) && !RT.equals(raidTracker))
-				{
+				if (RT.getUniqueID().equals(raidTracker.getUniqueID()) && !RT.equals(raidTracker)) {
 					log.info("writer updated log");
 					RT = raidTracker;
 				}

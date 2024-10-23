@@ -140,8 +140,7 @@ public class RaidTrackerPlugin extends Plugin
 
 		clientToolbar.addNavigation(navButton);
 
-		if (componentManager == null)
-		{
+		if (componentManager == null) {
 			componentManager = injector.getInstance(ComponentManager.class);
 		}
 		componentManager.onPluginStart();
@@ -164,10 +163,8 @@ public class RaidTrackerPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged e)
-	{
-		if (!e.getGroup().equals(RaidTrackerConfig.CONFIG_GROUP))
-		{
+	public void onConfigChanged(ConfigChanged e) {
+		if (!e.getGroup().equals(RaidTrackerConfig.CONFIG_GROUP)) {
 			return;
 		}
 		panel.loadRTList();
@@ -272,8 +269,7 @@ public class RaidTrackerPlugin extends Plugin
 
 		}
 
-		if (client.getGameState() == GameState.LOGGED_IN)
-		{
+		if (client.getGameState() == GameState.LOGGED_IN) {
 			// skip event while the game decides if the player belongs in a raid or not
 			if (client.getLocalPlayer() == null
 					|| client.getLocalPlayer().getWorldLocation().equals(TEMP_LOCATION))
@@ -308,7 +304,8 @@ public class RaidTrackerPlugin extends Plugin
 		if (raidTracker.isInTombsOfAmascut() && client.getWidget(WIDGET_TIMER) != null) {
 			if (!Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "00:00")
                     && !Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "0:00.00")
-                    && !raidStarted) {
+                    && !raidStarted
+            ) {
 				raidStarted = true;
 				raidTracker.setTeamSize(pointsTracker.getTeamSize());
 				raidTracker.setRaidLevel(client.getVarbitValue(Varbits.TOA_RAID_LEVEL));
@@ -318,12 +315,11 @@ public class RaidTrackerPlugin extends Plugin
 
 	// Thank Adam, LlemonDuck, and jocopa3 for creating PluginMessage event in core for us
 	@Subscribe
-	public void onPluginMessage(PluginMessage message)
-    {
+	public void onPluginMessage(PluginMessage message) {
 		if (message.getNamespace().equals(TOA_EVENT_NAMESPACE)
                 && message.getName().equals(TOA_EVENT_NAME_POINTS)
-                && (Integer) message.getData().get("version") == 1) {
-
+                && (Integer) message.getData().get("version") == 1
+        ) {
 			log.info("received PluginMessage from Tombs of Amascut plugin");
 			int personalPoints = (Integer) message.getData().get("personalPoints");
 			int totalPoints = (Integer) message.getData().get("totalPoints");
@@ -567,7 +563,6 @@ public class RaidTrackerPlugin extends Plugin
 			}
 
 			if (message.startsWith(RAID_COMPLETE_MESSAGE_COX_TOB) || message.startsWith(RAID_COMPLETE_MESSAGE_TOA)) {
-
 				if (raidTracker.isInRaidChambers()) {
 					raidTracker.setTotalPoints(client.getVarbitValue(Varbits.TOTAL_POINTS));
 					raidTracker.setPersonalPoints(client.getVarbitValue(Varbits.PERSONAL_POINTS));
@@ -625,18 +620,15 @@ public class RaidTrackerPlugin extends Plugin
 			if (message.contains("Challenge complete") || message.contains("total completion")) {
 
 				Matcher m;
-				if ((m = TOA_ROOM_COMPLETE_PATTERN.matcher(message)).matches())
-				{
+				if ((m = TOA_ROOM_COMPLETE_PATTERN.matcher(message)).matches()) {
 					String room = m.group(1).toLowerCase();
 					int duration = stringTimeToSeconds(m.group(2));
-					if (room == null || room.isEmpty())
-					{
+					if (room == null || room.isEmpty()) {
 						log.warn("Failed to find room {} for completion string {}", m.group(1), event.getMessage());
 						return;
 					}
 
-					switch (room)
-					{
+					switch (room) {
 						case "path of crondis":
 							raidTracker.setCrondisTime(duration);
 							break;
@@ -667,8 +659,7 @@ public class RaidTrackerPlugin extends Plugin
 					}
 				}
 
-				if ((m = TOA_COMPLETION_PATTERN.matcher(message)).matches())
-				{
+				if ((m = TOA_COMPLETION_PATTERN.matcher(message)).matches()) {
 					int duration = stringTimeToSeconds(m.group(3));
 					if (Objects.equals(m.group(2), "challenge"))
 					{
@@ -883,8 +874,7 @@ public class RaidTrackerPlugin extends Plugin
 		raidTracker.setInTheatreOfBlood(client.getVarbitValue(Varbits.THEATRE_OF_BLOOD) > 1);
 	}
 
-	private void checkToaPresence()
-	{
+	private void checkToaPresence() {
 		if (client.getGameState() != GameState.LOGGED_IN) {
 			return;
 		}
