@@ -1359,7 +1359,7 @@ public class RaidTrackerPanel extends PluginPanel {
 		filterFieldLow.setMaximumSize(new Dimension(42, 25));
 		filterFieldLow.setText(String.valueOf(raidLevelFilterLow));
 		filterFieldLow.setFocusable(true);
-		filterFieldLow.putClientProperty( "JTextField.selectAllOnFocusPolicy", "never" );
+		filterFieldLow.putClientProperty("JTextField.selectAllOnFocusPolicy", "never");
 
 		String val1 = filterFieldLow.getText();
 		filterFieldLow.addKeyListener(new KeyAdapter() {
@@ -1408,7 +1408,7 @@ public class RaidTrackerPanel extends PluginPanel {
 		filterFieldHigh.setMaximumSize(new Dimension(42, 25));
 		filterFieldHigh.setText(String.valueOf(raidLevelFilterHigh));
 		filterFieldHigh.setFocusable(true);
-		filterFieldHigh.putClientProperty( "JTextField.selectAllOnFocusPolicy", "never" );
+		filterFieldHigh.putClientProperty("JTextField.selectAllOnFocusPolicy", "never");
 
 		String val2 = filterFieldHigh.getText();
 
