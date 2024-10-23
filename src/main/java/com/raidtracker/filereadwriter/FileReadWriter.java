@@ -89,11 +89,6 @@ public class FileReadWriter {
 
 		//-------------------------------------------------------------------------------------------------------------
 
-//		System.out.println(
-//				gson.toJson(lootList, new TypeToken<List<RaidTrackerItem>>(){}.getType())); //[null], raidtrackerplugin is added to the list of types, which is automatically set to skipserialize true -> null return;
-
-
-
 		//massive bodge, works for now
 		return RTJson.toString().replace("\\\"", "\"").replace("\"[", "[").replace("]\"", "]");
 	}

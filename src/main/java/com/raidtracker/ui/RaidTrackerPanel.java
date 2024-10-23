@@ -2162,20 +2162,6 @@ public class RaidTrackerPanel extends PluginPanel {
 			case TOA:
 				tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= raidLevelFilterLow && RT.getRaidLevel() <= raidLevelFilterHigh)
 					.collect(Collectors.toCollection(ArrayList::new));
-//				if (raidLevelFilter.equals("All Levels")) {
-//					tempRTList = toaRTList;
-//
-//				} else if (raidLevelFilter.equals("Entry Mode"))
-//				{
-//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() < 150)
-//						.collect(Collectors.toCollection(ArrayList::new));
-//				} else if (raidLevelFilter.equals("Normal Mode")) {
-//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 150 && RT.getRaidLevel() < 300)
-//						.collect(Collectors.toCollection(ArrayList::new));
-//				} else {
-//					tempRTList = toaRTList.stream().filter(RT -> RT.getRaidLevel() >= 300)
-//						.collect(Collectors.toCollection(ArrayList::new));
-//				}
 				break;
 			default:
                 tempRTList = new ArrayList<>();
