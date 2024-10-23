@@ -71,8 +71,14 @@ public class RaidTrackerTest extends TestCase
 
 		raidTracker.setTeamSize(3);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "K1NG DK - Kodai insignia", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "K1NG DK - Kodai insignia",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 
 		raidTrackerPlugin.setSplits(raidTracker);
@@ -155,8 +161,14 @@ public class RaidTrackerTest extends TestCase
 		when(client.getVarbitValue(anyInt())).thenReturn(5); //random integer, I chose 5
 		raidTracker.setInRaidChambers(true);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Congratulations - your raid is complete! Team size: 15 Players Duration: 50:26 Personal best: 31:12", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Congratulations - your raid is complete! Team size: 15 Players Duration: 50:26 Personal best: 31:12",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertTrue(raidTracker.isRaidComplete());
 	}
@@ -168,8 +180,14 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setInRaidChambers(true);
 		raidTracker.setRaidComplete(true);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Congratulations - your raid is complete! Team size: Solo Duration: 1:40:26 Personal best: 31:12", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Congratulations - your raid is complete! Team size: Solo Duration: 1:40:26 Personal best: 31:12",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals(6026, raidTracker.getRaidTime());
 
@@ -205,19 +223,37 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setInTombsOfAmascut(true);
 		raidTracker.setRaidComplete(true);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Challenge complete: Path of Crondis. Duration: 0:34.20. Total: 0:34.20", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Challenge complete: Path of Crondis. Duration: 0:34.20. Total: 0:34.20",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals(34, raidTracker.getCrondisTime());
 
-		message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Challenge complete: The Wardens. Duration: 10:15.60Tombs of Amascut: Expert Mode challenge completion time: 34:07.20. Personal best: 28:16.20", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Challenge complete: The Wardens. Duration: 10:15.60Tombs of Amascut: Expert Mode challenge completion time: 34:07.20. Personal best: 28:16.20",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals(616, raidTracker.getWardensTime());
 		assertEquals(2047, raidTracker.getToaCompTime());
 
-		message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Tombs of Amascut: Expert Mode total completion time: 36:51.00. Personal best: 30:57.00", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Tombs of Amascut: Expert Mode total completion time: 36:51.00. Personal best: 30:57.00",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals(2211, raidTracker.getRaidTime());
 
@@ -242,8 +278,14 @@ public class RaidTrackerTest extends TestCase
 
 		when(itemManager.search(anyString())).thenReturn(kodaiTestList);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "K1NG DK - Kodai insignia", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "K1NG DK - Kodai insignia",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals("K1NG DK", raidTracker.getSpecialLootReceiver());
 		assertEquals("Kodai insignia", raidTracker.getSpecialLoot());
@@ -269,11 +311,23 @@ public class RaidTrackerTest extends TestCase
 
 		when(itemManager.search(anyString())).thenReturn(avernicTestList);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Avernic defender hilt", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Canvasba found something special: Avernic defender hilt",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
-		message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Lil\\u0027 Zik", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Canvasba found something special: Lil\\u0027 Zik",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals("Canvasba", raidTracker.getSpecialLootReceiver());
 		assertEquals("Avernic defender hilt", raidTracker.getSpecialLoot());
@@ -301,11 +355,23 @@ public class RaidTrackerTest extends TestCase
 
 		when(itemManager.search(anyString())).thenReturn(lightbearerTestList);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Lightbearer", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Canvasba found something special: Lightbearer",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
-		message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Tumeken\\u0027s guardian", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Canvasba found something special: Tumeken\\u0027s guardian",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertEquals("Canvasba", raidTracker.getSpecialLootReceiver());
 		assertEquals("Lightbearer", raidTracker.getSpecialLoot());
@@ -320,8 +386,14 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setInRaidChambers(true);
 		raidTracker.setRaidComplete(true);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Dust recipients: Canvasba", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.FRIENDSCHATNOTIFICATION,
+            "",
+            "Dust recipients: Canvasba",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		message.setMessage("Twisted Kit recipients: BallerTom");
 		raidTrackerPlugin.checkChatMessage(message, raidTracker);
@@ -337,8 +409,14 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setInRaidChambers(true);
 		raidTracker.setRaidComplete(true);
 
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.GAMEMESSAGE, "", "Your completed Chambers of Xeric Challenge Mode count is: 57.", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
+        ChatMessage message = new ChatMessage(
+            null,
+            ChatMessageType.GAMEMESSAGE,
+            "",
+            "Your completed Chambers of Xeric Challenge Mode count is: 57.",
+            "",
+            0);
+        raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
 		assertTrue(raidTracker.isChallengeMode());
 		assertEquals(57, raidTracker.getCompletionCount());

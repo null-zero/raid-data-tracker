@@ -306,7 +306,9 @@ public class RaidTrackerPlugin extends Plugin
 	public void onGameTick(GameTick gameTick) {
 		int WIDGET_TIMER = WidgetUtil.packComponentId(481, 46);
 		if (raidTracker.isInTombsOfAmascut() && client.getWidget(WIDGET_TIMER) != null) {
-			if (!Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "00:00") && !Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "0:00.00") && !raidStarted) {
+			if (!Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "00:00")
+                    && !Objects.equals(Objects.requireNonNull(client.getWidget(WIDGET_TIMER)).getText(), "0:00.00")
+                    && !raidStarted) {
 				raidStarted = true;
 				raidTracker.setTeamSize(pointsTracker.getTeamSize());
 				raidTracker.setRaidLevel(client.getVarbitValue(Varbits.TOA_RAID_LEVEL));
@@ -317,11 +319,10 @@ public class RaidTrackerPlugin extends Plugin
 	// Thank Adam, LlemonDuck, and jocopa3 for creating PluginMessage event in core for us
 	@Subscribe
 	public void onPluginMessage(PluginMessage message)
-	{
+    {
 		if (message.getNamespace().equals(TOA_EVENT_NAMESPACE)
-			&& message.getName().equals(TOA_EVENT_NAME_POINTS)
-			&& (Integer) message.getData().get("version") == 1)
-		{
+                && message.getName().equals(TOA_EVENT_NAME_POINTS)
+                && (Integer) message.getData().get("version") == 1) {
 
 			log.info("received PluginMessage from Tombs of Amascut plugin");
 			int personalPoints = (Integer) message.getData().get("personalPoints");
@@ -376,7 +377,6 @@ public class RaidTrackerPlugin extends Plugin
 				if (raidTracker.isChestOpened() || !raidTracker.isRaidComplete()) {
 					return;
 				}
-
 
 				raidTracker.setChestOpened(true);
 
