@@ -382,13 +382,14 @@ public class SplitChanger extends JPanel {
 
     EnumSet<RaidUniques> getUniquesList() {
 		switch (raidTrackerPanel.getSelectedRaidTab()) {
+            case COX:
+                return raidTrackerPanel.getCoxUniques();
 			case TOB:
 				return raidTrackerPanel.getTobUniques();
 			case TOA:
 				return raidTrackerPanel.getToaUniques();
-			case COX:
-			default:
-				return raidTrackerPanel.getCoxUniques();
+            default:
+                return null;
 		}
     }
 
