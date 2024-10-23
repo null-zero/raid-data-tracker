@@ -115,6 +115,9 @@ public class RaidTrackerPanel extends PluginPanel {
 	@Setter
 	private int raidLevelFilterHigh = 600;
 
+    private static final int toaRaidLevelMin = 0;
+    private static final int toaRaidLevelMax = 600;
+
 	@Setter
 	private boolean raidLevelFilterIsAPI = false;
 
@@ -1369,7 +1372,7 @@ public class RaidTrackerPanel extends PluginPanel {
 
 
 				if (userInput.isEmpty()) {
-					raidLevelFilterLow = 0;
+					raidLevelFilterLow = toaRaidLevelMin;
 					return;
 				}
 
@@ -1384,17 +1387,17 @@ public class RaidTrackerPanel extends PluginPanel {
 
 				raidLevelFilterLow = Integer.parseInt(userInput);
 
-				if (Integer.parseInt(userInput) == 0) {
-					raidLevelFilterLow = 0;
+				if (Integer.parseInt(userInput) == toaRaidLevelMin) {
+					raidLevelFilterLow = toaRaidLevelMin;
 				}
 
-				if (Integer.parseInt(userInput) > 600) {
+				if (Integer.parseInt(userInput) > toaRaidLevelMax) {
 					SwingUtilities.invokeLater(new Runnable() {
 
 						@Override
 						public void run() {
-							filterFieldLow.setText("600");
-							raidLevelFilterLow = 600;
+							filterFieldLow.setText(String.valueOf(toaRaidLevelMax));
+							raidLevelFilterLow = toaRaidLevelMax;
 						}
 					});
 				}
@@ -1419,7 +1422,7 @@ public class RaidTrackerPanel extends PluginPanel {
 				String userInput = filterFieldHigh.getText();
 
 				if (userInput.isEmpty()) {
-					raidLevelFilterHigh = 600;
+					raidLevelFilterHigh = toaRaidLevelMax;
 					return;
 				}
 
@@ -1428,7 +1431,7 @@ public class RaidTrackerPanel extends PluginPanel {
 					return;
 				}
 
-				if (Integer.parseInt(userInput) == 0) {
+				if (Integer.parseInt(userInput) == toaRaidLevelMin) {
 					return;
 				}
 
@@ -1438,14 +1441,14 @@ public class RaidTrackerPanel extends PluginPanel {
 
 				raidLevelFilterHigh = Integer.parseInt(userInput);
 
-				if (Integer.parseInt(userInput) > 600) {
+				if (Integer.parseInt(userInput) > toaRaidLevelMax) {
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						@Override
 						public void run()
 						{
-							filterFieldHigh.setText("600");
-							raidLevelFilterHigh = 600;
+							filterFieldHigh.setText(String.valueOf(toaRaidLevelMax));
+							raidLevelFilterHigh = toaRaidLevelMax;
 						}
 					});
 				}
