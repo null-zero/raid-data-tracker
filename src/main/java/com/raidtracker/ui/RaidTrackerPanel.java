@@ -1275,7 +1275,7 @@ public class RaidTrackerPanel extends PluginPanel {
 				save.setIcon(new ImageIcon(saveHover));
 			}
 
-			public void mouseExited (java.awt.event.MouseEvent e){
+			public void mouseExited (MouseEvent e){
 				save.setIcon(new ImageIcon(saveIcon));
 			}
 		});
@@ -1284,7 +1284,7 @@ public class RaidTrackerPanel extends PluginPanel {
                 refresh.setIcon(new ImageIcon(refreshHover));
             }
 
-            public void mouseExited (java.awt.event.MouseEvent e){
+            public void mouseExited (MouseEvent e){
                 refresh.setIcon(new ImageIcon(refreshIcon));
             }
         });
@@ -1294,7 +1294,7 @@ public class RaidTrackerPanel extends PluginPanel {
                 delete.setIcon(new ImageIcon(deleteHover));
             }
 
-            public void mouseExited (java.awt.event.MouseEvent e){
+            public void mouseExited (MouseEvent e){
                 delete.setIcon(new ImageIcon(deleteIcon));
             }
         });
