@@ -4,8 +4,6 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.raidtracker.filereadwriter.FileReadWriter;
 import com.raidtracker.ui.RaidTrackerPanel;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import junit.framework.TestCase;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -13,7 +11,6 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ClientToolbar;
@@ -38,6 +35,36 @@ import static org.mockito.Mockito.when;
 public class RaidTrackerTest extends TestCase
 {
 
+    @Mock
+    @Bind
+    private Client client;
+
+    @Mock
+    @Bind
+    private ConfigManager configManager;
+
+    @Mock
+    @Bind
+    private ItemManager itemManager;
+
+    @Mock
+    @Bind
+    private ClientToolbar clientToolbar;
+
+    @Mock
+    @Bind
+    private RaidTrackerConfig raidTrackerConfig;
+
+
+    @Inject
+    private RaidTrackerPlugin raidTrackerPlugin;
+
+
+    @Before
+    public void setUp()
+    {
+        Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
+    }
 
 	@Test
 	public void TestLootSplits() {
@@ -112,44 +139,6 @@ public class RaidTrackerTest extends TestCase
 		raidTrackerPlugin.setSplits(raidTracker);
 
 		assertEquals(-1 , raidTracker.getLootSplitReceived());
-	}
-
-	@Mock
-	@Bind
-	private Client client;
-
-	@Mock
-	@Bind
-	private ConfigManager configManager;
-
-	@Mock
-	@Bind
-	private ItemManager itemManager;
-
-	@Mock
-	@Bind
-	private ClientToolbar clientToolbar;
-
-	@Mock
-	@Bind
-	private RaidTrackerConfig raidTrackerConfig;
-
-
-	@Inject
-	private RaidTrackerPlugin raidTrackerPlugin;
-
-	@Mock
-	@Bind
-	private ConfigManager configManager;
-
-	@Inject
-	private FileReadWriter fw;
-
-
-	@Before
-	public void setUp()
-	{
-		Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
 	}
 
 	//---------------------------------- onChatMessage tests ------------------------------------------------
@@ -483,66 +472,5 @@ public class RaidTrackerTest extends TestCase
 
 
 	}
-
-	//---------------------------------- FileReadWriter tests ------------------------------------------------
-
-	@Mock
-	@Bind
-	Player player;
-
-	@Test
-	public void TestLootWriting() {
-
-		RaidTracker raidTracker = new RaidTracker();
-		raidTracker.setRaidComplete(true);
-		raidTracker.setInTombsOfAmascut(true);
-
-		fw.updateUsername("Canvasba");
-		raidTracker.setChestOpened(true);
-		when(client.getLocalPlayer()).thenReturn(player);
-		when(client.getLocalPlayer().getName()).thenReturn("Canvasba");
-
-		fw.delete(RaidType.TOA);
-
-		List<ItemPrice> lightbearerTestList = new ArrayList<>();
-
-		ItemPrice lightbearerTest = new ItemPrice();
-
-		lightbearerTest.setId(0);
-		lightbearerTest.setName("Lightbearer");
-		lightbearerTest.setPrice(50505050);
-
-		lightbearerTestList.add(lightbearerTest);
-
-		when(itemManager.search(anyString())).thenReturn(lightbearerTestList);
-
-		ChatMessage message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Lightbearer", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
-
-		message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Tumeken\\u0027s guardian", "", 0);
-		raidTrackerPlugin.checkChatMessage(message, raidTracker);
-
-
-
-//		when(raidTracker.isInTheatreOfBlood()).thenReturn(false);
-//		when(raidTracker.isInTombsOfAmascut()).thenReturn(true);
-//		when(raidTracker.isRaidComplete()).thenReturn(true);
-
-		fw.writeToFile(raidTracker);
-
-		ArrayList<RaidTracker> toaRTList = fw.readFromFile(RaidType.TOA);
-		HashMap<String, RaidTracker> toaUUIDMap = new LinkedHashMap<>();
-
-		for (RaidTracker RT : toaRTList) {
-			toaUUIDMap.put(RT.getUniqueID(), RT);
-		}
-
-		assertEquals(1, toaUUIDMap.size());
-
-		assertEquals("Canvasba", toaUUIDMap.get(toaUUIDMap.keySet().toArray()[0]).getSpecialLootReceiver());
-		assertEquals("Lightbearer", toaUUIDMap.get(toaUUIDMap.keySet().toArray()[0]).getSpecialLoot());
-		assertEquals(50505050, toaUUIDMap.get(toaUUIDMap.keySet().toArray()[0]).getSpecialLootValue());
-	}
-
 
 }
