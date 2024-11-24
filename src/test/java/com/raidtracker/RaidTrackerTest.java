@@ -140,7 +140,7 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setLootSplitReceived(-1);
 		raidTrackerPlugin.setSplits(raidTracker);
 
-		assertEquals(-1 , raidTracker.getLootSplitReceived());
+		assertEquals(-1, raidTracker.getLootSplitReceived());
 	}
 
 	//---------------------------------- onChatMessage tests ------------------------------------------------
