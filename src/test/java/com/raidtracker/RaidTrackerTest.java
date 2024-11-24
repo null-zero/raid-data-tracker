@@ -131,7 +131,7 @@ public class RaidTrackerTest extends TestCase
 		raidTrackerPlugin.setSplits(raidTracker);
 
 		assertTrue(raidTracker.isFreeForAll());
-		assertEquals(raidTracker.getLootSplitReceived(), 2000000);
+		assertEquals(2000000, raidTracker.getLootSplitReceived());
 		assertEquals(-1, raidTracker.getLootSplitPaid());
 
 		raidTracker.setSpecialLootReceiver("K1NG DK");
