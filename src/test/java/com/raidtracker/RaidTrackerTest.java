@@ -35,6 +35,36 @@ import static org.mockito.Mockito.when;
 public class RaidTrackerTest extends TestCase
 {
 
+    @Mock
+    @Bind
+    private Client client;
+
+    @Mock
+    @Bind
+    private ConfigManager configManager;
+
+    @Mock
+    @Bind
+    private ItemManager itemManager;
+
+    @Mock
+    @Bind
+    private ClientToolbar clientToolbar;
+
+    @Mock
+    @Bind
+    private RaidTrackerConfig raidTrackerConfig;
+
+
+    @Inject
+    private RaidTrackerPlugin raidTrackerPlugin;
+
+
+    @Before
+    public void setUp()
+    {
+        Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
+    }
 
 	@Test
 	public void TestLootSplits() {
@@ -109,37 +139,6 @@ public class RaidTrackerTest extends TestCase
 		raidTrackerPlugin.setSplits(raidTracker);
 
 		assertEquals(-1 , raidTracker.getLootSplitReceived());
-	}
-
-	@Mock
-	@Bind
-	private Client client;
-
-	@Mock
-	@Bind
-	private ConfigManager configManager;
-
-	@Mock
-	@Bind
-	private ItemManager itemManager;
-
-	@Mock
-	@Bind
-	private ClientToolbar clientToolbar;
-
-	@Mock
-	@Bind
-	private RaidTrackerConfig raidTrackerConfig;
-
-
-	@Inject
-	private RaidTrackerPlugin raidTrackerPlugin;
-
-
-	@Before
-	public void setUp()
-	{
-		Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
 	}
 
 	//---------------------------------- onChatMessage tests ------------------------------------------------
