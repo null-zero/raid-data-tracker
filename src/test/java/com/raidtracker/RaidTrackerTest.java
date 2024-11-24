@@ -13,6 +13,7 @@ import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.http.api.item.ItemPrice;
 import org.junit.Before;
@@ -55,14 +56,15 @@ public class RaidTrackerTest extends TestCase
     @Bind
     private RaidTrackerConfig raidTrackerConfig;
 
+    @Mock
+    @Bind
+    private PluginManager pluginManager;
 
     @Inject
     private RaidTrackerPlugin raidTrackerPlugin;
 
-
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
     }
 
