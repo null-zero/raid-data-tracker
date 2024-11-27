@@ -116,6 +116,8 @@ public class RaidTrackerPlugin extends Plugin
 	@Inject
 	private PluginManager pluginManager;
 
+	private boolean migrateCheck = false;
+
 	@Provides
 	RaidTrackerConfig provideConfig(ConfigManager configManager)
 	{
@@ -150,16 +152,19 @@ public class RaidTrackerPlugin extends Plugin
 
 		if (client.getGameState().equals(GameState.LOGGED_IN) || client.getGameState().equals(GameState.LOADING))
 		{
-			fw.updateUsername(client.getUsername());
-			SwingUtilities.invokeLater(() -> panel.loadRTList());
 		}
+
+		configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "hideMigrationViewTemp", false);
 	}
 
 	@Override
 	protected void shutDown() {
 		raidTracker.setInRaidChambers(false);
 		clientToolbar.removeNavigation(navButton);
+
+		configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "migrated_" + client.getAccountHash(), 1);
 		reset();
+
 	}
 
 	@Subscribe
@@ -168,6 +173,18 @@ public class RaidTrackerPlugin extends Plugin
 			return;
 		}
 		panel.loadRTList();
+	}
+
+	private void migrateConfigCheck() {
+		String migrated = configManager.getConfiguration(RaidTrackerConfig.CONFIG_GROUP, "migrated_" + client.getAccountHash());
+
+		if (migrated != null && !"1".equals(migrated)) {
+			fw.setAccountMigrated(true);
+			return;
+		}
+
+		fw.setAccountMigrated(true);
+		SwingUtilities.invokeLater(() -> panel.showMigrationView());
 	}
 
 	@Subscribe
@@ -193,7 +210,7 @@ public class RaidTrackerPlugin extends Plugin
 					return;
 				}
 
-				fw.writeToFile(raidTracker);
+				fw.writeToFile(raidTracker, RaidType.COX);
 
 				writerStarted = true;
 
@@ -215,7 +232,7 @@ public class RaidTrackerPlugin extends Plugin
 					return;
 				}
 
-				fw.writeToFile(raidTracker);
+				fw.writeToFile(raidTracker, RaidType.TOB);
 
 				writerStarted = true;
 
@@ -260,11 +277,7 @@ public class RaidTrackerPlugin extends Plugin
 			return;
 		}
 
-		if (event.getGameState() == GameState.LOGGING_IN)
-		{
-			fw.updateUsername(client.getUsername());
-			SwingUtilities.invokeLater(() -> panel.loadRTList());
-
+		if (event.getGameState() == GameState.LOGGING_IN) {
 		}
 
 		if (client.getGameState() == GameState.LOGGED_IN) {
@@ -275,6 +288,9 @@ public class RaidTrackerPlugin extends Plugin
 				//noinspection UnnecessaryReturnStatement
 				return;
 			}
+
+			SwingUtilities.invokeLater(() -> panel.updateView());
+
 		}
 		else if (client.getGameState() == GameState.LOGIN_SCREEN
 				|| client.getGameState() == GameState.CONNECTION_LOST)
@@ -285,6 +301,9 @@ public class RaidTrackerPlugin extends Plugin
 		{
 			reset();
 		}
+
+		configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "hideMigrationViewTemp", false);
+		migrateCheck = false;
 	}
 
 	@Subscribe
@@ -298,6 +317,25 @@ public class RaidTrackerPlugin extends Plugin
 
 	@Subscribe
 	public void onGameTick(GameTick gameTick) {
+		if (client.getLocalPlayer() == null) {
+			return;
+		}
+
+		// client.getLocalPlayer().getName() doesn't update until the first game tick
+		if (!String.valueOf(client.getAccountHash()).equals(fw.getAccountHash())
+                || !Objects.equals(client.getLocalPlayer().getName(), fw.getUsername())) {
+			log.info("account hash and username updated");
+			fw.updateUsernameHash(String.valueOf(client.getAccountHash()), client.getLocalPlayer().getName());
+			SwingUtilities.invokeLater(() -> panel.loadRTList());
+		}
+
+		if (!migrateCheck
+                && !Boolean.parseBoolean(configManager.getConfiguration(
+                    RaidTrackerConfig.CONFIG_GROUP,
+                "hideMigrationViewTemp"))) {
+			SwingUtilities.invokeLater(this::migrateConfigCheck);
+			migrateCheck = true;
+		}
 
 		int WIDGET_TIMER = WidgetUtil.packComponentId(TOA_CANVAS_WIDGET_ID, TOA_TIMER_WIDGET_ID);
 		if (raidTracker.isInTombsOfAmascut() && client.getWidget(WIDGET_TIMER) != null) {
@@ -357,7 +395,7 @@ public class RaidTrackerPlugin extends Plugin
 
 				raidTracker.setLootList(lootListFactory(rewardItemContainer.getItems()));
 
-				fw.writeToFile(raidTracker);
+				fw.writeToFile(raidTracker, RaidType.COX);
 
 				writerStarted = true;
 
@@ -445,7 +483,7 @@ public class RaidTrackerPlugin extends Plugin
 
 				raidTracker.setLootList(lootListFactory(rewardItemContainer.getItems()));
 
-				fw.writeToFile(raidTracker);
+				fw.writeToFile(raidTracker, RaidType.TOA);
 
 				writerStarted = true;
 
@@ -486,6 +524,8 @@ public class RaidTrackerPlugin extends Plugin
 		raidTracker.setLoggedIn(true);
 
 		String playerName = "";
+
+		RaidType currentRaid = raidTracker.inRaidChambers ? RaidType.COX : raidTracker.isInTheatreOfBlood() ? RaidType.TOB : RaidType.TOA;
 
 		if (client.getLocalPlayer() != null && client.getLocalPlayer().getName() != null) {
 			playerName = client.getLocalPlayer().getName();
@@ -712,7 +752,7 @@ public class RaidTrackerPlugin extends Plugin
 
 					setSplits(altRT);
 
-					fw.writeToFile(altRT);
+					fw.writeToFile(altRT, currentRaid);
 
 					SwingUtilities.invokeLater(() -> panel.addDrop(altRT, false));
 				}
@@ -752,7 +792,7 @@ public class RaidTrackerPlugin extends Plugin
 						RaidTracker altRT = copyData();
 						altRT.setKitReceiver(recip.trim());
 
-						fw.writeToFile(altRT);
+						fw.writeToFile(altRT, currentRaid);
 
 						SwingUtilities.invokeLater(() -> panel.addDrop(altRT, false));
 					}
@@ -770,7 +810,7 @@ public class RaidTrackerPlugin extends Plugin
 						RaidTracker altRT = copyData();
 						altRT.setDustReceiver(recip.trim());
 
-						fw.writeToFile(altRT);
+						fw.writeToFile(altRT, currentRaid);
 
 						SwingUtilities.invokeLater(() -> panel.addDrop(altRT, false));
 					}
@@ -797,7 +837,7 @@ public class RaidTrackerPlugin extends Plugin
 
 					altRT.setPetInMyName(inOwnName);
 
-					fw.writeToFile(altRT);
+					fw.writeToFile(altRT, currentRaid);
 
 					SwingUtilities.invokeLater(() -> panel.addDrop(altRT, false));
 				}
@@ -905,6 +945,8 @@ public class RaidTrackerPlugin extends Plugin
 		raidTracker = new RaidTracker();
 		writerStarted = false;
 		raidStarted = false;
+		migrateCheck = false;
+		configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "hideMigrationViewTemp", false);
 	}
 
 	//from stackoverflow

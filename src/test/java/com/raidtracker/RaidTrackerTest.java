@@ -517,7 +517,7 @@ public class RaidTrackerTest extends TestCase
         message  = new ChatMessage(null, ChatMessageType.FRIENDSCHATNOTIFICATION, "", "Canvasba found something special: Tumeken\\u0027s guardian", "", 0);
         raidTrackerPlugin.checkChatMessage(message, raidTracker);
 
-        fw.writeToFile(raidTracker);
+        fw.writeToFile(raidTracker, RaidType.TOA);
 
         ArrayList<RaidTracker> toaRTList = fw.readFromFile(RaidType.TOA);
         HashMap<String, RaidTracker> toaUUIDMap = new LinkedHashMap<>();

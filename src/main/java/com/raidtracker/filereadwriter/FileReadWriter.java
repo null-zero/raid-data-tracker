@@ -10,7 +10,10 @@ import com.google.inject.Inject;
 import com.raidtracker.RaidTracker;
 import com.raidtracker.RaidTrackerItem;
 import com.raidtracker.RaidType;
+import java.util.Arrays;
+import java.util.Iterator;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -28,16 +31,61 @@ import static net.runelite.client.RuneLite.RUNELITE_DIR;
 public class FileReadWriter {
 
 	@Getter
-	private String username;
+	private String accountHash;
+	@Setter
+	@Getter
+	private String username = "";
 	private String coxDir;
 	private String tobDir;
 	private String toaDir;
     private String defaultDir;
 
+	@Setter
+	private boolean accountMigrated;
+
 	@Inject
 	private Gson gson;
 
-	public void writeToFile(RaidTracker raidTracker)
+	public void migrate() {
+		File dir = new File(RUNELITE_DIR, "raid-data tracker");
+
+		File dir_user = new File(dir, username);
+		File dir_cox = new File(dir, "cox");
+		File dir_tob = new File(dir, "tob");
+		File dir_toa = new File(dir, "toa");
+
+		String old_file_name = "raid_tracker_data.log";
+
+		File old_user_cox = new File(dir_user + "\\cox\\" + old_file_name);
+		File old_user_tob = new File(dir_user + "\\tob\\" + old_file_name);
+		File old_user_toa = new File(dir_user + "\\toa\\" + old_file_name);
+
+		if (old_user_cox.isFile()) {
+			migrateLog(old_user_cox, RaidType.COX);
+		}
+		if (old_user_tob.isFile()) {
+			migrateLog(old_user_tob, RaidType.TOB);
+		}
+		if (old_user_toa.isFile()) {
+			migrateLog(old_user_toa, RaidType.TOA);
+		}
+
+		File old_cox = new File(dir_cox, old_file_name);
+		File old_tob = new File(dir_tob, old_file_name);
+		File old_toa = new File(dir_toa, old_file_name);
+
+		if (old_cox.isFile()) {
+			migrateLog(old_user_cox, RaidType.COX);
+		}
+		if (old_tob.isFile()) {
+			migrateLog(old_user_tob, RaidType.TOB);
+		}
+		if (old_toa.isFile()) {
+			migrateLog(old_user_toa, RaidType.TOA);
+		}
+	}
+
+	public void writeToFile(RaidTracker raidTracker, RaidType raidType)
 	{
 		String dir;
 
@@ -57,7 +105,9 @@ public class FileReadWriter {
 			log.info("writer started");
 			//use json format so serializing and deserializing is easy
 			JsonParser parser = new JsonParser();
-			String fileName = dir + "\\raid_tracker_data.log";
+
+			String fileName = dir + "\\" + raidType.name().toLowerCase() + ".log";
+//			String fileName = dir + "\\raid_tracker_data.log";
 			FileWriter fw = new FileWriter(fileName,true); //the true will append the new data
 			gson.toJson(parser.parse(getJSONString(raidTracker, gson, parser)), fw);
 			fw.append("\n");
@@ -101,7 +151,8 @@ public class FileReadWriter {
 		if (alternateFile.length() != 0) {
 			fileName = alternateFile;
 		} else {
-			fileName = dir + "\\raid_tracker_data.log";
+			fileName = dir + "\\" + raidType.name().toLowerCase() + ".log";
+//			fileName = dir + "\\raid_tracker_data.log";
 		}
 
 		try {
@@ -171,9 +222,65 @@ public class FileReadWriter {
         this.defaultDir = dir_default.getAbsolutePath();
 	}
 
+	public void createFoldersHash() {
+		File dir = new File(RUNELITE_DIR, "raid-data tracker");
+		IGNORE_RESULT(dir.mkdir());
+
+		File[] files = dir.listFiles();
+		if(files != null)
+		{
+			Iterator<File> iterator = Arrays.stream(files).iterator();
+			while (iterator.hasNext()) {
+				File f = iterator.next();
+
+				if(f.isDirectory() && f.getName().contains(accountHash))
+				{
+					if (f.getName().contains(username)) {
+						log.info("Active log dir set to: " + f.getName());
+						dir = new File(dir + "\\" + f.getName());
+						break;
+					}
+
+					dir = new File(dir, username + "_" + accountHash);
+					f.renameTo(dir);
+					log.info("Username out of date, folder renamed and active log dir set to: " + dir);
+					break;
+				}
+
+				if (!iterator.hasNext()) {
+					dir = new File(dir, username + "_" + accountHash);
+					IGNORE_RESULT(dir.mkdir());
+					System.out.println("No migrated folder found for user, active log dir created and set to: " + dir);
+				}
+			}
+		}
+
+		File newCoxFile = new File(dir, "cox.log");
+		File newTobFile = new File(dir, "tob.log");
+		File newToaFile = new File(dir, "toa.log");
+
+		try {
+			IGNORE_RESULT(newCoxFile.createNewFile());
+			IGNORE_RESULT(newTobFile.createNewFile());
+			IGNORE_RESULT(newToaFile.createNewFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		this.coxDir = dir.getAbsolutePath();
+		this.tobDir = dir.getAbsolutePath();
+		this.toaDir = dir.getAbsolutePath();
+	}
+
 	public void updateUsername(final String username) {
 		this.username = username;
 		createFolders();
+	}
+
+	public void updateUsernameHash(final String accountHash, final  String username) {
+		this.accountHash = accountHash;
+		this.username = username;
+		createFoldersHash();
 	}
 
 	// Used for making sure ToA loot and points is accurate
@@ -185,7 +292,8 @@ public class FileReadWriter {
 		try {
 			JsonParser parser = new JsonParser();
 
-			String fileName = dir + "\\raid_tracker_data.log";
+			String fileName = dir + "\\" + raidType.name().toLowerCase() + ".log";
+//			String fileName = dir + "\\raid_tracker_data.log";
 
 			ArrayList<RaidTracker> RTList = readFromFile(raidType);
 
@@ -215,7 +323,8 @@ public class FileReadWriter {
 		try {
 			JsonParser parser = new JsonParser();
 
-			String fileName = dir + "\\raid_tracker_data.log";
+			String fileName = dir + "\\" + raidType.name().toLowerCase() + ".log";
+//			String fileName = dir + "\\raid_tracker_data.log";
 
 
 			FileWriter fw = new FileWriter(fileName, false); //the true will append the new data
@@ -241,10 +350,46 @@ public class FileReadWriter {
 		}
 	}
 
+	private void migrateLog(File oldLog, RaidType raidType) {
+		File dir = new File(RUNELITE_DIR, "raid-data tracker");
+
+		try {
+			JsonParser parser = new JsonParser();
+
+			String fileName = dir + "\\" + username + "_" + accountHash + "\\" + raidType.name().toLowerCase() + ".log";
+
+			FileWriter fw = new FileWriter(fileName, false); //the true will append the new data
+
+			ArrayList<RaidTracker> oldRTList = readFromFile(String.valueOf(oldLog), raidType);
+			ArrayList<RaidTracker> newRTList = readFromFile(fileName, raidType);
+
+			for (RaidTracker oldRT : oldRTList)
+			{
+
+				Iterator<RaidTracker> iterator = newRTList.iterator();
+				while (iterator.hasNext()) {
+					RaidTracker currentRT = iterator.next();
+
+					if (oldRT.getUniqueID().equals(currentRT.getUniqueID())) {
+						break;
+					}
+				}
+				if (!iterator.hasNext()) {
+					gson.toJson(parser.parse(getJSONString(oldRT, gson, parser)), fw);
+					fw.append("\n");
+				}
+			}
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public boolean delete(RaidType raidType) {
 		String dir = getRaidDirectory(raidType);
 
-		File newFile = new File(dir + "\\raid_tracker_data.log");
+		File newFile = new File(dir, raidType.name().toLowerCase() + ".log");
+//		File newFile = new File(dir + "\\raid_tracker_data.log");
 
 		boolean isDeleted = newFile.delete();
 

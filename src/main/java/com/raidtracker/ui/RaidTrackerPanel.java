@@ -1,21 +1,31 @@
 package com.raidtracker.ui;
 
-
 import com.raidtracker.RaidTracker;
 import com.raidtracker.RaidTrackerConfig;
 import com.raidtracker.RaidTrackerItem;
 import com.raidtracker.RaidType;
 import com.raidtracker.WorldUtils;
 import com.raidtracker.filereadwriter.FileReadWriter;
-
+import java.awt.Desktop;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+import javax.swing.BorderFactory;
+import javax.swing.JTextPane;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemID;
+import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.RuneScapeProfileType;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
@@ -69,6 +79,9 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 import static java.util.Comparator.comparing;
+
+import javax.imageio.ImageIO;
+import static net.runelite.client.RuneLite.RUNELITE_DIR;
 
 @Slf4j
 public class RaidTrackerPanel extends PluginPanel {
@@ -227,8 +240,6 @@ public class RaidTrackerPanel extends PluginPanel {
     }
 
 	public void showWarningView() {
-		panel.removeAll();
-
 		JPanel title = new JPanel();
 		title.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -258,8 +269,10 @@ public class RaidTrackerPanel extends PluginPanel {
 		} else if (!Boolean.parseBoolean(toaPluginExternalConfig)) {
 			titleLabelWrapper.add(getWarningLabel(2), BorderLayout.CENTER);
 		} else {
-			updateView();
+			return;
 		}
+
+		panel.removeAll();
 
 		gbc.gridwidth = 2;
 		title.add(titleLabelWrapper, gbc);
@@ -347,12 +360,132 @@ public class RaidTrackerPanel extends PluginPanel {
 		return titleLabel;
 	}
 
+	public void showMigrationView() {
+		panel.removeAll();
+
+		String migrated = configManager.getConfiguration(RaidTrackerConfig.CONFIG_GROUP, "migrated_" + client.getAccountHash());
+
+		JPanel title = new JPanel();
+		title.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+
+		JPanel titleLabelWrapper = new JPanel();
+		titleLabelWrapper.add(textPanel("Migration view test"));
+
+		title.add(titleLabelWrapper, gbc);
+		gbc.gridy++;
+
+		JTextPane pane1 = getTextPane("Version 1.5 included an update to how " +
+            "logs are stored, fixing a bug that " +
+            "stopped logs from being able to track " +
+            "through username changes.<br><br>" +
+			"This update requires your current " +
+            "logs to be migrated to the new file " +
+            "structure. Due to the previous " +
+            "method used to store logs, if you " +
+            "have completed raids on multiple " +
+            "accounts or changed your username, " +
+            "the logs might be combined and require a manual " +
+            "migration.");
+
+		JTextPane pane2 = getTextPane("Otherwise, you can choose to start fresh logs or chose to migrate " +
+            "and associate current logs with <span style='color:lime'>" + client.getLocalPlayer().getName() + "</span>");
+
+
+		title.add(pane1, gbc);
+		gbc.gridy++;
+
+		JButton openDir = new JButton();
+		openDir.setText("<html>Open directory</html>");
+		openDir.addActionListener(e -> {
+			try
+			{
+				Desktop.getDesktop().open(new File(RUNELITE_DIR, "raid-data tracker"));
+			}
+			catch (IOException ex)
+			{
+				throw new RuntimeException(ex);
+			}
+		});
+
+		title.add(openDir, gbc);
+		gbc.gridy++;
+		title.add( Box.createVerticalStrut(5 ), gbc);
+		gbc.gridy++;
+
+		title.add(pane2, gbc);
+		gbc.gridy++;
+		title.add( Box.createVerticalStrut(5 ), gbc);
+		gbc.gridy++;
+
+        JButton enable2 = new JButton();
+		enable2.setText("<html>Migrate current logs</html>");
+		enable2.addActionListener(e -> {
+			fw.migrate();
+			configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "migrated_" + client.getAccountHash(), 2);
+            loadRTList();
+
+		});
+		title.add(enable2, gbc);
+		gbc.gridy++;
+
+		title.add( Box.createVerticalStrut(5 ), gbc);
+		gbc.gridy++;
+
+		JButton newLogsBtn = new JButton();
+		newLogsBtn.setText("<html>Start fresh</html>");
+		newLogsBtn.addActionListener(e -> {
+			configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "migrated_" + client.getAccountHash(), 2);
+            fw.createFoldersHash();
+			updateView();
+		});
+		title.add(newLogsBtn, gbc);
+		gbc.gridy++;
+		title.add( Box.createVerticalStrut(5 ), gbc);
+		gbc.gridy++;
+
+		JButton close = new JButton();
+		close.setText("Close");
+
+		close.addActionListener(e -> {
+			configManager.setConfiguration(RaidTrackerConfig.CONFIG_GROUP, "hideMigrationViewTemp", true);
+			updateView();
+		});
+		title.add(close, gbc);
+
+		panel.add(title);
+		panel.revalidate();
+		panel.repaint();
+
+	}
+
+
+	private JTextPane getTextPane(String htmlString) {
+		JTextPane pane = new JTextPane();
+
+		pane.setEditable(false);
+		pane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		pane.setContentType("text/html");
+		pane.setText("<html>" + htmlString + "</html>");
+
+		SimpleAttributeSet set = new SimpleAttributeSet();
+		StyleConstants.setAlignment(set, StyleConstants.ALIGN_CENTER);
+		StyledDocument doc = pane.getStyledDocument();
+		doc.setParagraphAttributes(0, doc.getLength(), set, false);
+
+		return pane;
+	}
+
 	public void updateView() {
 		updateView(false);
 	}
 
     public void updateView(boolean filterUpdate) {
-
         // If the panel is updated we don't need to show data for Beta worlds
         if (WorldUtils.playerOnBetaWorld(client)) {
 			panel.removeAll();
@@ -377,6 +510,13 @@ public class RaidTrackerPanel extends PluginPanel {
 			}
 			panel.remove(component);
 		}
+		JButton migrateButton = new JButton();
+		migrateButton.setText("View Migration panel");
+
+		migrateButton.addActionListener(e -> {
+			showMigrationView();
+		});
+		panel.add(migrateButton);
 
         if (config.showRegularDrops()) {
             SwingUtilities.invokeLater(() -> {
@@ -388,6 +528,8 @@ public class RaidTrackerPanel extends PluginPanel {
 					}
 					panel.remove(component);
 				}
+
+				panel.add(migrateButton);
 
 				if (config.showTitle() && !filterUpdate) {
 					panel.add(title);
@@ -2169,6 +2311,15 @@ public class RaidTrackerPanel extends PluginPanel {
 			default:
                 tempRTList = new ArrayList<>();
                 break;
+		}
+
+		String currentProfileType = String.valueOf(RuneScapeProfileType.getCurrent(client));
+
+		// Include logs that don't have a profile type set when logged into a STANDARD world to remain backwards compatible
+		if (currentProfileType.equals("STANDARD")) {
+			tempRTList = tempRTList.stream().filter(RT -> (RT.getProfileType().equals(currentProfileType) || RT.getProfileType().isEmpty())).collect(Collectors.toCollection(ArrayList::new));
+		} else {
+			tempRTList = tempRTList.stream().filter(RT -> (RT.getProfileType().equals(currentProfileType))).collect(Collectors.toCollection(ArrayList::new));
 		}
 
         switch (teamSizeFilter) {
