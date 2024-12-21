@@ -13,6 +13,7 @@ import net.runelite.api.Player;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.http.api.item.ItemPrice;
 import org.junit.Before;
@@ -35,6 +36,37 @@ import static org.mockito.Mockito.when;
 public class RaidTrackerTest extends TestCase
 {
 
+    @Mock
+    @Bind
+    private Client client;
+
+    @Mock
+    @Bind
+    private ConfigManager configManager;
+
+    @Mock
+    @Bind
+    private ItemManager itemManager;
+
+    @Mock
+    @Bind
+    private ClientToolbar clientToolbar;
+
+    @Mock
+    @Bind
+    private RaidTrackerConfig raidTrackerConfig;
+
+    @Mock
+    @Bind
+    private PluginManager pluginManager;
+
+    @Inject
+    private RaidTrackerPlugin raidTrackerPlugin;
+
+    @Before
+    public void setUp() {
+        Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
+    }
 
 	@Test
 	public void TestLootSplits() {
@@ -99,7 +131,7 @@ public class RaidTrackerTest extends TestCase
 		raidTrackerPlugin.setSplits(raidTracker);
 
 		assertTrue(raidTracker.isFreeForAll());
-		assertEquals(raidTracker.getLootSplitReceived(), 2000000);
+		assertEquals(2000000, raidTracker.getLootSplitReceived());
 		assertEquals(-1, raidTracker.getLootSplitPaid());
 
 		raidTracker.setSpecialLootReceiver("K1NG DK");
@@ -108,38 +140,7 @@ public class RaidTrackerTest extends TestCase
 		raidTracker.setLootSplitReceived(-1);
 		raidTrackerPlugin.setSplits(raidTracker);
 
-		assertEquals(-1 , raidTracker.getLootSplitReceived());
-	}
-
-	@Mock
-	@Bind
-	private Client client;
-
-	@Mock
-	@Bind
-	private ConfigManager configManager;
-
-	@Mock
-	@Bind
-	private ItemManager itemManager;
-
-	@Mock
-	@Bind
-	private ClientToolbar clientToolbar;
-
-	@Mock
-	@Bind
-	private RaidTrackerConfig raidTrackerConfig;
-
-
-	@Inject
-	private RaidTrackerPlugin raidTrackerPlugin;
-
-
-	@Before
-	public void setUp()
-	{
-		Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
+		assertEquals(-1, raidTracker.getLootSplitReceived());
 	}
 
 	//---------------------------------- onChatMessage tests ------------------------------------------------
