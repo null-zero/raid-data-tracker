@@ -17,6 +17,7 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
@@ -75,6 +76,8 @@ public class RaidTrackerPlugin extends Plugin
 
     private static final int TOA_CANVAS_WIDGET_ID = 481;
     private static final int TOA_TIMER_WIDGET_ID = 46;
+
+    private static final int RAID_PARTY_SIZE = 5424;
 
 	@Inject
 	private Client client;
@@ -564,8 +567,8 @@ public class RaidTrackerPlugin extends Plugin
 			if (message.startsWith(RAID_COMPLETE_MESSAGE_COX_TOB) || message.startsWith(RAID_COMPLETE_MESSAGE_TOA)) {
 				if (raidTracker.isInRaidChambers()) {
 					raidTracker.setTotalPoints(client.getVarbitValue(Varbits.TOTAL_POINTS));
-					raidTracker.setPersonalPoints(client.getVarbitValue(Varbits.PERSONAL_POINTS));
-					raidTracker.setTeamSize(client.getVarbitValue(Varbits.RAID_PARTY_SIZE));
+					raidTracker.setPersonalPoints(client.getVarpValue(VarPlayer.RAIDS_PERSONAL_POINTS));
+					raidTracker.setTeamSize(client.getVarbitValue(RAID_PARTY_SIZE));
 				} else if (raidTracker.isInTombsOfAmascut()) {
 					raidTracker.setPersonalPoints(pointsTracker.getPersonalTotalPoints());
 				}
