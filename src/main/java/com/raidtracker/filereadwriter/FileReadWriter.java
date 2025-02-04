@@ -57,7 +57,7 @@ public class FileReadWriter {
 			fw.append("\n");
 			fw.close();
         } catch (IOException ioe) {
-			System.err.println("IOException: " + ioe.getMessage() + " in writeToFile");
+			log.error("IOException: {} in writeToFile", ioe.getMessage());
 		}
 	}
 
@@ -100,7 +100,7 @@ public class FileReadWriter {
 					RaidTracker parsed = gson.fromJson(parser.parse(line), RaidTracker.class);
 					RTList.add(parsed);
 				} catch (JsonSyntaxException e) {
-					System.out.println("Bad line: " + line);
+					log.warn("Bad line: {}", line);
 				}
 			}
 
