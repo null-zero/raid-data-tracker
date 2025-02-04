@@ -773,8 +773,8 @@ public class RaidTrackerPanel extends PluginPanel {
         int totalPoints = 0;
 
         if (loaded) {
-            personalPoints = atleastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getPersonalPoints).sum());
-            totalPoints = atleastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getTotalPoints).sum());
+            personalPoints = atLeastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getPersonalPoints).sum());
+            totalPoints = atLeastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getTotalPoints).sum());
         }
 
         JLabel personalPointsLabel = textPanel(format(personalPoints));
@@ -800,7 +800,7 @@ public class RaidTrackerPanel extends PluginPanel {
         int splitGP = 0;
 
         if (loaded) {
-            splitGP = atleastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getLootSplitReceived).sum());
+            splitGP = atLeastZero(getFilteredRTList().stream().mapToInt(RaidTracker::getLootSplitReceived).sum());
 
 
         }
@@ -2038,7 +2038,7 @@ public class RaidTrackerPanel extends PluginPanel {
         addDrop(RT, true);
     }
 
-    public int atleastZero(int maybeLessThanZero) {
+    public int atLeastZero(int maybeLessThanZero) {
         return Math.max(maybeLessThanZero, 0);
     }
 

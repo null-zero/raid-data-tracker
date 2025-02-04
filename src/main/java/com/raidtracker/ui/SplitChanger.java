@@ -102,8 +102,8 @@ public class SplitChanger extends JPanel {
         splitReceivedWrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
         JTextField splitReceived = getTextField();
-        splitReceived.setText(format(atleastZero(raidTracker.getLootSplitReceived())));
-        splitReceived.setToolTipText(NumberFormat.getInstance().format(atleastZero(raidTracker.getLootSplitReceived())));
+        splitReceived.setText(format(atLeastZero(raidTracker.getLootSplitReceived())));
+        splitReceived.setToolTipText(NumberFormat.getInstance().format(atLeastZero(raidTracker.getLootSplitReceived())));
 
         splitReceived.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
             if (!locked) {
@@ -118,7 +118,7 @@ public class SplitChanger extends JPanel {
                         setSplit();
                     }
 
-                    splitReceived.setToolTipText(NumberFormat.getInstance().format(atleastZero(raidTracker.getLootSplitReceived())));
+                    splitReceived.setToolTipText(NumberFormat.getInstance().format(atLeastZero(raidTracker.getLootSplitReceived())));
 
                     variablesChanged();
                 }
@@ -127,7 +127,7 @@ public class SplitChanger extends JPanel {
 
         splitReceived.addActionListener(e -> {
             //format the number when losing focus
-            splitReceived.setText(format(atleastZero(raidTracker.getLootSplitReceived())));
+            splitReceived.setText(format(atLeastZero(raidTracker.getLootSplitReceived())));
         });
 
         splitReceivedWrapper.add(splitReceivedLabel);
@@ -151,8 +151,8 @@ public class SplitChanger extends JPanel {
             else {
                 setSplit();
             }
-            splitReceived.setText(format(atleastZero(raidTracker.getLootSplitReceived())));
-            splitReceived.setToolTipText(NumberFormat.getInstance().format(atleastZero(raidTracker.getLootSplitReceived())));
+            splitReceived.setText(format(atLeastZero(raidTracker.getLootSplitReceived())));
+            splitReceived.setToolTipText(NumberFormat.getInstance().format(atLeastZero(raidTracker.getLootSplitReceived())));
 
             variablesChanged();
 
@@ -192,8 +192,8 @@ public class SplitChanger extends JPanel {
             locked = true;
             raidTracker.setTeamSize(Math.min(Math.max(1, Integer.parseInt(teamSize.getValue().toString())), 100));
             setSplit();
-            splitReceived.setText(format(atleastZero(raidTracker.getLootSplitReceived())));
-            splitReceived.setToolTipText(NumberFormat.getInstance().format(atleastZero(raidTracker.getLootSplitReceived())));
+            splitReceived.setText(format(atLeastZero(raidTracker.getLootSplitReceived())));
+            splitReceived.setToolTipText(NumberFormat.getInstance().format(atLeastZero(raidTracker.getLootSplitReceived())));
 
             variablesChanged();
 
@@ -223,7 +223,7 @@ public class SplitChanger extends JPanel {
         return textField;
     }
 
-    private int atleastZero(int maybeLessThanZero) {
+    private int atLeastZero(int maybeLessThanZero) {
         return Math.max(maybeLessThanZero, 0);
     }
 
